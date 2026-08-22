@@ -233,6 +233,8 @@ select, input[type="text"], input[type="range"] {
 
 .progress-track { height: 10px; border-radius: 99px; background: #e7e1d6; overflow: hidden; }
 .progress-fill { width: 0; height: 100%; background: var(--green); transition: width .25s ease; }
+.answer-note { grid-column: 1 / -1; margin-top: -8px; color: var(--accent); font-size: .84rem; font-weight: 800; }
+.answer-note.good { color: var(--green); }
 .copy-status { min-height: 1.7em; color: var(--green); font-weight: 750; }
 .copy-output { min-height: 190px; margin-top: 12px; font-size: .9rem; }
 .range-value { display: inline-grid; place-items: center; min-width: 2rem; margin-left: 8px; padding: 2px 8px; border-radius: 999px; background: var(--accent-soft); color: var(--accent); font-weight: 800; }
@@ -262,6 +264,20 @@ select, input[type="text"], input[type="range"] {
 .checks li.pass::before { content: "✓"; color: var(--green); font-weight: 800; }
 
 .source { border-left: 5px solid var(--green); }
+.learning-dashboard { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin: 18px 0; }
+.learning-stat { background: var(--paper); border-radius: 12px; padding: 14px; }
+.learning-stat strong { display: block; font-size: 1.15rem; }
+.learning-stat span { color: var(--muted); font-size: .78rem; }
+.review-list { margin: 12px 0 0; padding-left: 1.2rem; }
+.review-list li { margin: 5px 0; }
+.lesson-status { float: right; border-radius: 999px; padding: 3px 9px; background: var(--paper); color: var(--muted); font-size: .72rem; font-weight: 800; }
+.example-card.is-complete { border-color: #9cc5b2; background: var(--green-soft); }
+.example-card.is-complete .lesson-status { background: white; color: var(--green); }
+.learning-loop { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin: 18px 0; }
+.learning-loop div { border: 1px solid var(--line); border-radius: 12px; padding: 14px; background: var(--white); }
+.learning-loop strong { display: block; color: var(--accent); }
+.learning-loop span { font-size: .86rem; color: var(--muted); }
+.completion-card h2 { margin: 0 0 8px; }
 nav { margin-top: 70px; padding-top: 22px; border-top: 1px solid var(--line); }
 .lesson-nav { display: flex; justify-content: space-between; gap: 18px; flex-wrap: wrap; }
 
@@ -274,6 +290,8 @@ th { color: var(--accent); font-size: 0.82rem; text-transform: uppercase; }
   main { padding-top: 32px; }
   .formula { grid-template-columns: 1fr 1fr; }
   .example-grid { grid-template-columns: 1fr; }
+  .learning-dashboard { grid-template-columns: 1fr; }
+  .learning-loop { grid-template-columns: 1fr 1fr; }
 }
 
 @media print {
