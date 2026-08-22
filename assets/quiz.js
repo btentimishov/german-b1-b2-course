@@ -10,7 +10,8 @@ const COURSE_LESSONS = [
   ["0007", "Wem schickst du was?", "lessons/0007-wem-schickst-du-was.html"],
   ["0008", "Ein oder einen?", "lessons/0008-ein-oder-einen.html"],
   ["0009", "Der Nomen-Pass", "lessons/0009-der-nomen-pass.html"],
-  ["0010", "Wem–was im Rhythmus", "lessons/0010-wem-was-im-rhythmus.html"]
+  ["0010", "Wem–was im Rhythmus", "lessons/0010-wem-was-im-rhythmus.html"],
+  ["0011", "Ich gebe, schicke, zeige", "lessons/0011-ich-gebe-schicke-zeige.html"]
 ].map(([id, title, href]) => ({ id, title, href }));
 
 function readCourseState() {
@@ -349,7 +350,7 @@ document.querySelectorAll("[data-word-card]").forEach((card) => {
   card.addEventListener("click", () => card.classList.toggle("revealed"));
 });
 
-document.querySelectorAll("[data-article-lab], [data-genus-lab], [data-context-lab], [data-case-lab], [data-ending-lab], [data-automaticity-lab]").forEach((lab) => {
+document.querySelectorAll("[data-article-lab], [data-genus-lab], [data-context-lab], [data-case-lab], [data-ending-lab], [data-automaticity-lab], [data-action-lab]").forEach((lab) => {
   const selects = [...lab.querySelectorAll("[data-answer]")];
   const button = lab.querySelector("[data-check-articles]");
   const feedback = lab.querySelector(".feedback");
@@ -605,6 +606,39 @@ document.querySelectorAll("[data-handover-production]").forEach((checker) => {
     feedback.textContent = passed === checks.length
       ? "4/4 — drei vollständige Übergaben. Lies sie jetzt in einem ruhigen Rhythmus laut."
       : `${passed}/4 — vervollständige alle drei Sätze; du brauchst einem, einer, einen und ein.`;
+    feedback.className = `feedback ${passed === checks.length ? "good" : "try"}`;
+  });
+});
+
+document.querySelectorAll("[data-action-production]").forEach((checker) => {
+  const input = checker.querySelector("textarea");
+  const button = checker.querySelector("[data-check-production]");
+  const feedback = checker.querySelector(".feedback");
+  const checks = [...checker.querySelectorAll("[data-check]")];
+
+  button?.addEventListener("click", () => {
+    const text = input.value.trim();
+    const recipientM = "(?:einem Kollegen|einem Kunden|einem Freund|einem Chef)";
+    const recipientF = "(?:einer Kollegin|einer Kundin|einer Freundin|einer Chefin)";
+    const thingM = "(?:einen Ordner|einen Link|einen Vertrag|einen Bericht|einen Schlüssel)";
+    const thingF = "(?:eine Datei|eine Nachricht|eine Einladung)";
+    const thingN = "(?:ein Foto|ein Paket|ein Dokument|ein Buch|ein Angebot)";
+    const pairPattern = new RegExp(`\\bIch\\s+(?:gebe|schicke|zeige)\\s+(?:${recipientM}|${recipientF})\\s+(?:${thingM}|${thingF}|${thingN})\\b`, "gi");
+    const results = {
+      verbs: /\bIch\s+gebe\b/i.test(text) && /\bIch\s+schicke\b/i.test(text) && /\bIch\s+zeige\b/i.test(text),
+      recipients: new RegExp(`\\b${recipientM}\\b`, "i").test(text) && new RegExp(`\\b${recipientF}\\b`, "i").test(text),
+      objects: new RegExp(`\\b${thingM}\\b`, "i").test(text) && new RegExp(`\\b(?:${thingF}|${thingN})\\b`, "i").test(text),
+      three: (text.match(pairPattern) || []).length >= 3
+    };
+    const passed = checks.reduce((count, item) => {
+      const ok = results[item.dataset.check];
+      item.classList.toggle("pass", ok);
+      return count + Number(ok);
+    }, 0);
+    checker.dataset.score = `${passed}/${checks.length}`;
+    feedback.textContent = passed === checks.length
+      ? "4/4 — Verb, Empfänger und Sache stimmen in allen drei Sätzen."
+      : `${passed}/4 — prüfe jeden Satz in dieser Reihenfolge: Ich + Verb-e, Wem?, Was?`;
     feedback.className = `feedback ${passed === checks.length ? "good" : "try"}`;
   });
 });
