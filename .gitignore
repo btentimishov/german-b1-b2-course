@@ -1,0 +1,11 @@
+.DS_Store
+.agents/
+.codex/
+.claude/
+docs/
+AGENTS.md
+MISSION.md
+NOTES.md
+RESOURCES.md
+learning-records/
+skills-lock.json
