@@ -95,6 +95,7 @@ a { color: var(--accent); text-underline-offset: 0.18em; }
   gap: 10px;
   margin: 30px 0;
 }
+.formula.three-step { grid-template-columns: repeat(3, 1fr); }
 
 .formula div {
   background: var(--white);
@@ -222,7 +223,7 @@ select, input[type="text"], input[type="range"] {
   border-bottom: 1px solid var(--line);
 }
 
-.quiz-row select {
+.quiz-row select, .quiz-row input[type="text"] {
   width: 100%;
   padding: 9px 12px;
   border: 1px solid var(--line);
@@ -289,6 +290,7 @@ th { color: var(--accent); font-size: 0.82rem; text-transform: uppercase; }
   body { font-size: 16px; }
   main { padding-top: 32px; }
   .formula { grid-template-columns: 1fr 1fr; }
+  .formula.three-step { grid-template-columns: 1fr; }
   .example-grid { grid-template-columns: 1fr; }
   .learning-dashboard { grid-template-columns: 1fr; }
   .learning-loop { grid-template-columns: 1fr 1fr; }

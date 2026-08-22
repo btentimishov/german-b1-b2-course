@@ -9,7 +9,8 @@ const COURSE_LESSONS = [
   ["0006", "Ein oder das?", "lessons/0006-ein-oder-das.html"],
   ["0007", "Wem schickst du was?", "lessons/0007-wem-schickst-du-was.html"],
   ["0008", "Ein oder einen?", "lessons/0008-ein-oder-einen.html"],
-  ["0009", "Der Nomen-Pass", "lessons/0009-der-nomen-pass.html"]
+  ["0009", "Der Nomen-Pass", "lessons/0009-der-nomen-pass.html"],
+  ["0010", "Wem–was im Rhythmus", "lessons/0010-wem-was-im-rhythmus.html"]
 ].map(([id, title, href]) => ({ id, title, href }));
 
 function readCourseState() {
@@ -348,8 +349,8 @@ document.querySelectorAll("[data-word-card]").forEach((card) => {
   card.addEventListener("click", () => card.classList.toggle("revealed"));
 });
 
-document.querySelectorAll("[data-article-lab], [data-genus-lab], [data-context-lab], [data-case-lab], [data-ending-lab]").forEach((lab) => {
-  const selects = [...lab.querySelectorAll("select[data-answer]")];
+document.querySelectorAll("[data-article-lab], [data-genus-lab], [data-context-lab], [data-case-lab], [data-ending-lab], [data-automaticity-lab]").forEach((lab) => {
+  const selects = [...lab.querySelectorAll("[data-answer]")];
   const button = lab.querySelector("[data-check-articles]");
   const feedback = lab.querySelector(".feedback");
   const fill = lab.querySelector(".progress-fill");
@@ -358,7 +359,7 @@ document.querySelectorAll("[data-article-lab], [data-genus-lab], [data-context-l
     let score = 0;
     const mistakes = [];
     selects.forEach((select) => {
-      const correct = select.value === select.dataset.answer;
+      const correct = select.value.trim().toLocaleLowerCase("de-DE") === select.dataset.answer.trim().toLocaleLowerCase("de-DE");
       select.setAttribute("aria-invalid", String(!correct));
       select.style.borderColor = correct ? "var(--green)" : "var(--accent)";
       if (correct) score += 1;
@@ -385,8 +386,8 @@ document.querySelectorAll("[data-article-lab], [data-genus-lab], [data-context-l
     lab.dataset.score = `${score}/${selects.length}`;
     fill.style.width = `${(score / selects.length) * 100}%`;
     feedback.textContent = score === selects.length
-      ? `${score}/${selects.length} — stark! Alle Artikel sitzen.`
-      : `${score}/${selects.length} — die roten Felder brauchen noch einen Versuch.`;
+      ? lab.dataset.successMessage || `${score}/${selects.length} — stark! Alle Artikel sitzen.`
+      : lab.dataset.retryMessage || `${score}/${selects.length} — die roten Felder brauchen noch einen Versuch.`;
     feedback.className = `feedback ${score === selects.length ? "good" : "try"}`;
   });
 });
@@ -576,6 +577,38 @@ document.querySelectorAll("[data-passport-production]").forEach((checker) => {
   });
 });
 
+document.querySelectorAll("[data-handover-production]").forEach((checker) => {
+  const input = checker.querySelector("textarea");
+  const button = checker.querySelector("[data-check-production]");
+  const feedback = checker.querySelector(".feedback");
+  const checks = [...checker.querySelectorAll("[data-check]")];
+
+  button?.addEventListener("click", () => {
+    const text = input.value.trim();
+    const recipientM = "(?:einem Kollegen|einem Kunden|einem Freund|einem Chef)";
+    const recipientF = "(?:einer Kollegin|einer Kundin|einer Freundin|einer Chefin)";
+    const thingM = "(?:einen Kugelschreiber|einen Schlüssel|einen Vertrag|einen Bericht|einen Link)";
+    const thingN = "(?:ein Buch|ein Formular|ein Angebot|ein Dokument|ein Paket)";
+    const pairPattern = new RegExp(`\\b(?:gebe|schicke|sende|zeige|bringe)\\s+(?:${recipientM}|${recipientF})\\s+(?:${thingM}|${thingN})\\b`, "gi");
+    const results = {
+      three: (text.match(pairPattern) || []).length >= 3,
+      recipients: new RegExp(`\\b${recipientM}\\b`, "i").test(text) && new RegExp(`\\b${recipientF}\\b`, "i").test(text),
+      objects: new RegExp(`\\b${thingM}\\b`, "i").test(text) && new RegExp(`\\b${thingN}\\b`, "i").test(text),
+      vocabulary: new Set((text.match(/Kugelschreiber|Schlüssel|Vertrag|Bericht|Link|Buch|Formular|Angebot|Dokument|Paket/gi) || []).map((word) => word.toLowerCase())).size >= 3
+    };
+    const passed = checks.reduce((count, item) => {
+      const ok = results[item.dataset.check];
+      item.classList.toggle("pass", ok);
+      return count + Number(ok);
+    }, 0);
+    checker.dataset.score = `${passed}/${checks.length}`;
+    feedback.textContent = passed === checks.length
+      ? "4/4 — drei vollständige Übergaben. Lies sie jetzt in einem ruhigen Rhythmus laut."
+      : `${passed}/4 — vervollständige alle drei Sätze; du brauchst einem, einer, einen und ein.`;
+    feedback.className = `feedback ${passed === checks.length ? "good" : "try"}`;
+  });
+});
+
 document.querySelectorAll("[data-copy-lesson]").forEach((section) => {
   const button = section.querySelector("[data-copy-button]");
   const status = section.querySelector(".copy-status");
@@ -592,7 +625,7 @@ document.querySelectorAll("[data-copy-lesson]").forEach((section) => {
     const answerHeading = section.dataset.answerHeading || "ARTIKEL-ANTWORTEN";
     const productionHeading = section.dataset.productionHeading || "MEINE NACHRICHT";
     const nextFocus = section.dataset.nextFocus || "Übe weiter Artikel und nützlichen Wortschatz.";
-    const articleAnswers = [...lab.querySelectorAll("select[data-answer]")]
+    const articleAnswers = [...lab.querySelectorAll("[data-answer]")]
       .map((select) => `${select.dataset.prompt}: ${select.value || "—"}`)
       .join("\n");
     const production = productionBox.querySelector("textarea")?.value.trim() || "—";
