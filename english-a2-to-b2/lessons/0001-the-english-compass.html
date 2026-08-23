@@ -1,0 +1,188 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="A playful, private A2-to-B2 English placement adventure for grammar, vocabulary, comprehension, and writing.">
+    <title>The English Compass — A2 to B2 placement adventure</title>
+    <link rel="stylesheet" href="../assets/course.css">
+    <script src="../assets/placement.js" defer></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main-content">Skip to the activity</a>
+
+    <div class="course-shell">
+      <header class="topbar" aria-label="Course navigation">
+        <a class="brand" href="#hero-screen" aria-label="English Compass home">
+          <span class="brand-mark" aria-hidden="true">✦</span>
+          <span class="brand-label">The English Compass</span>
+        </a>
+        <div class="top-actions">
+          <a class="quiet-button" href="../reference/0001-a2-to-b2-roadmap.html">See the roadmap</a>
+          <button class="quiet-button" type="button" data-reset>Start over</button>
+        </div>
+      </header>
+
+      <main id="main-content">
+        <section id="hero-screen" class="hero-grid" aria-labelledby="hero-title">
+          <div class="hero-copy">
+            <p class="eyebrow">A private 12–15 minute adventure</p>
+            <h1 id="hero-title">Find your way to <span class="hero-word">confident</span> English.</h1>
+            <p class="lede">Travel through three little worlds. Your answers will reveal what is already strong—and the shortest, friendliest route from A2 toward B2.</p>
+            <ul class="hero-meta" aria-label="Assessment features">
+              <li>21 small challenges</li>
+              <li>grammar + vocabulary</li>
+              <li>one short story</li>
+              <li>no lost lives</li>
+            </ul>
+            <button id="start-adventure" class="primary-button" type="button">Open the compass <span aria-hidden="true">→</span></button>
+            <button id="resume-adventure" class="secondary-button is-hidden" type="button">Continue saved journey</button>
+          </div>
+
+          <div class="map-panel" aria-hidden="true">
+            <svg class="route-line" viewBox="0 0 300 540" preserveAspectRatio="none">
+              <path d="M55 75 C230 90, 240 185, 165 250 S55 355, 108 480"></path>
+            </svg>
+            <div class="map-stop stop-one"><div><span>A2</span><strong>Everyday Garden</strong></div></div>
+            <div class="map-stop stop-two"><div><span>B1</span><strong>Conversation City</strong></div></div>
+            <div class="map-stop stop-three"><div><span>B2</span><strong>Ideas Observatory</strong></div></div>
+            <div class="map-pin"><span>You</span></div>
+            <div class="floating-note">Mistakes are not red marks. They are directions.</div>
+          </div>
+        </section>
+
+        <section id="profile-screen" class="assessment-card is-hidden" aria-labelledby="profile-title">
+          <div class="assessment-head">
+            <span class="brand-mark" aria-hidden="true">✦</span>
+            <div class="progress-wrap">
+              <div class="progress-labels"><span>Set your destination</span><span>Step 0</span></div>
+              <div class="progress-track"><div class="progress-bar" style="width: 2%"></div></div>
+            </div>
+            <span class="question-count">Hello!</span>
+          </div>
+          <div class="question-stage">
+            <p class="world-label">Before we begin</p>
+            <h2 id="profile-title">Where should English take you?</h2>
+            <p class="question-context">This changes the situations and vocabulary in future lessons. Choose the answer that feels most important now.</p>
+
+            <form id="profile-form" class="profile-form">
+              <div class="field-group">
+                <label class="field-label" for="learner-name">What should your teacher call you? <span style="font-weight:500;color:var(--ink-soft)">(optional)</span></label>
+                <input id="learner-name" class="text-input" name="name" autocomplete="given-name" maxlength="40" placeholder="Your first name">
+              </div>
+
+              <fieldset class="field-group" style="border:0;padding:0;margin:0">
+                <legend class="choice-legend">My most important destination is…</legend>
+                <div class="goal-options">
+                  <label class="goal-chip"><input type="radio" name="goal" value="Everyday life and relationships"> Everyday life &amp; relationships</label>
+                  <label class="goal-chip"><input type="radio" name="goal" value="Travel and independence"> Travel &amp; independence</label>
+                  <label class="goal-chip"><input type="radio" name="goal" value="Work and professional confidence"> Work &amp; professional confidence</label>
+                  <label class="goal-chip"><input type="radio" name="goal" value="Study, books, and media"> Study, books &amp; media</label>
+                </div>
+              </fieldset>
+
+              <div class="question-actions">
+                <span class="lock-note">Your answers stay only in this browser.</span>
+                <button class="primary-button" type="submit">Begin the journey →</button>
+              </div>
+            </form>
+          </div>
+        </section>
+
+        <section id="quiz-screen" class="assessment-card is-hidden" aria-labelledby="question-prompt">
+          <div class="assessment-head">
+            <button id="previous-question" class="icon-button" type="button" aria-label="Previous question">←</button>
+            <div class="progress-wrap">
+              <div class="progress-labels"><span id="progress-step">The Everyday Garden</span><span>Placement path</span></div>
+              <div class="progress-track" role="progressbar" aria-label="Placement progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+                <div id="progress-bar" class="progress-bar"></div>
+              </div>
+            </div>
+            <span id="question-count" class="question-count">1 / 21</span>
+          </div>
+
+          <div class="question-stage">
+            <p id="world-label" class="world-label">A2 · Grammar</p>
+            <h2 id="question-prompt" tabindex="-1">Question</h2>
+            <p id="question-context" class="question-context">Choose the answer that sounds most natural and accurate.</p>
+            <button id="audio-prompt" class="audio-prompt is-hidden" type="button"><span aria-hidden="true">▶</span> Play the sentence</button>
+            <div id="answer-grid" class="answer-grid" aria-label="Answer choices"></div>
+
+            <div class="question-actions">
+              <span class="lock-note">No green or red yet—the compass reveals the pattern at the end.</span>
+              <button id="next-question" class="primary-button" type="button" disabled>Lock answer →</button>
+            </div>
+          </div>
+        </section>
+
+        <section id="writing-screen" class="assessment-card is-hidden" aria-labelledby="writing-title">
+          <div class="assessment-head">
+            <button id="writing-back" class="icon-button" type="button" aria-label="Back to the last question">←</button>
+            <div class="progress-wrap">
+              <div class="progress-labels"><span>Your own voice</span><span>Final step</span></div>
+              <div class="progress-track" role="progressbar" aria-label="Placement progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="96">
+                <div id="writing-progress-bar" class="progress-bar"></div>
+              </div>
+            </div>
+            <span class="question-count">Story</span>
+          </div>
+
+          <div class="question-stage">
+            <p class="world-label">The final postcard</p>
+            <h2 id="writing-title">Tell a small true story.</h2>
+            <p class="question-context">Describe a recent day that did not go as planned. What happened? What did you do? What would you do differently next time?</p>
+            <div class="field-group" style="margin-top:26px">
+              <label class="field-label" for="writing-answer">Write 60–90 words if you can. Do not use a translator—this is a friendly snapshot, not a performance.</label>
+              <textarea id="writing-answer" class="writing-input" spellcheck="true" placeholder="Last week, I planned to…"></textarea>
+              <div class="writing-meta"><span id="word-count">0 words</span><span>Minimum for a useful sample: 35 words</span></div>
+            </div>
+            <div class="question-actions">
+              <span class="lock-note">The teacher will review this part; the browser will not pretend to grade your voice.</span>
+              <button id="finish-assessment" class="primary-button" type="button" disabled>Reveal my route →</button>
+            </div>
+          </div>
+        </section>
+
+        <section id="results-screen" class="results-card is-hidden" aria-labelledby="result-title">
+          <div class="results-hero">
+            <div>
+              <p id="result-eyebrow" class="eyebrow">Your learning estimate</p>
+              <h2 id="result-title">Your route is ready</h2>
+              <p id="result-summary" class="lede">This is where your next lessons begin.</p>
+              <p id="result-score" style="font-weight:850;margin-top:18px">0/21 knowledge checks</p>
+            </div>
+            <div id="level-stamp" class="level-stamp" aria-label="Estimated level">A2</div>
+          </div>
+
+          <div class="result-grid">
+            <section class="result-section" aria-labelledby="strengths-title">
+              <h3 id="strengths-title">Your compass readings</h3>
+              <div id="skill-bars" class="skill-bars"></div>
+              <p id="writing-note" class="result-note">Your writing sample is waiting for teacher review.</p>
+            </section>
+
+            <section class="result-section" aria-labelledby="route-title">
+              <h3 id="route-title">Your first three stepping stones</h3>
+              <ol id="next-route" class="next-route"></ol>
+            </section>
+          </div>
+
+          <div class="result-actions">
+            <button id="copy-results" class="primary-button" type="button">Copy result for my teacher</button>
+            <a class="secondary-button" href="../reference/0001-a2-to-b2-roadmap.html">Explore the A2→B2 roadmap</a>
+            <button class="secondary-button" type="button" data-reset>Take it again</button>
+          </div>
+
+          <p class="source-note">This is a learning estimate, not a certificate. It is guided by the Council of Europe’s <a href="https://www.coe.int/en/web/common-european-framework-reference-languages/cefr-descriptors" target="_blank" rel="noreferrer">CEFR descriptors</a>. For an optional external comparison, try <a href="https://www.cambridgeenglish.org/test-your-english/" target="_blank" rel="noreferrer">Cambridge English’s free quick check</a>.</p>
+        </section>
+      </main>
+
+      <footer class="lesson-footer">
+        <p>Designed with communicative topics, retrieval, guidance fading, and spaced review inspired by the published methods of <a href="https://www.busuu.com/en/it-works/busuu-methodology" target="_blank" rel="noreferrer">Busuu</a>, <a href="https://blog.duolingo.com/right-level-of-difficulty/" target="_blank" rel="noreferrer">Duolingo</a>, <a href="https://quizlet.com/features/how-quizlet-works" target="_blank" rel="noreferrer">Quizlet</a>, and <a href="https://www.babbel.com/the-babbel-method" target="_blank" rel="noreferrer">Babbel</a>.</p>
+        <p>Questions or something unclear? Ask your teacher—the best course is a conversation.</p>
+      </footer>
+    </div>
+
+    <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  </body>
+</html>
