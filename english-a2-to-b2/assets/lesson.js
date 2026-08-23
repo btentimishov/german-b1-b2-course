@@ -8,6 +8,8 @@
   const storageKey = `english-compass-${lessonId}-v1`;
   const cards = [...document.querySelectorAll("[data-practice]")];
   const storyFields = [...document.querySelectorAll("[data-story-field]")];
+  const checkItems = [...document.querySelectorAll("[data-check]")];
+  const minimumStoryWords = Number(root.dataset.storyMin || 25);
   const state = {
     completed: [],
     attempts: {},
@@ -40,11 +42,13 @@
   }
 
   function storyChecks(story) {
-    return {
-      time: /\b(yesterday|last\s+(night|week|weekend|monday|tuesday|wednesday|thursday|friday|saturday|sunday)|on\s+(monday|tuesday|wednesday|thursday|friday|saturday|sunday)|\d+\s+days?\s+ago)\b/i.test(story),
-      past: /\b(was|were|had|did|went|wanted|planned|prepared|made|took|helped|called|visited|cooked|baked|stopped|started|finished|needed|decided|stayed|played|watched|worked|arrived|left|felt|thought|could|[a-z]+ed)\b/i.test(story),
-      connector: /\b(but|so|because|then|in the end|after that)\b/i.test(story)
-    };
+    return checkItems.map((item) => {
+      try {
+        return new RegExp(item.dataset.pattern, item.dataset.flags || "i").test(story);
+      } catch {
+        return false;
+      }
+    });
   }
 
   function updateStory() {
@@ -53,9 +57,7 @@
     });
     const story = getStory();
     const checks = storyChecks(story);
-    document.querySelector("[data-check='time']").classList.toggle("is-done", checks.time);
-    document.querySelector("[data-check='past']").classList.toggle("is-done", checks.past);
-    document.querySelector("[data-check='connector']").classList.toggle("is-done", checks.connector);
+    checkItems.forEach((item, index) => item.classList.toggle("is-done", checks[index]));
     document.querySelector("[data-story-count]").textContent = `${countWords(story)} words`;
     saveState();
     updateProgress();
@@ -64,7 +66,7 @@
   function updateProgress() {
     const story = getStory();
     const checks = storyChecks(story);
-    const storyReady = countWords(story) >= 25 && Object.values(checks).every(Boolean);
+    const storyReady = countWords(story) >= minimumStoryWords && checks.every(Boolean);
     const completedCount = state.completed.length + (storyReady ? 1 : 0);
     const total = cards.length + 1;
     const percent = Math.round((completedCount / total) * 100);
@@ -126,17 +128,21 @@
 
   function buildReport() {
     const attempts = Object.values(state.attempts).reduce((sum, value) => sum + value, 0);
-    return `English Compass · Lesson 0002 result
+    const lessonNumber = root.dataset.lessonNumber || lessonId.replace(/\D/g, "");
+    const learner = root.dataset.learner || "Learner";
+    const lessonTitle = root.dataset.lessonTitle || document.title;
+    const reportPrompt = root.dataset.reportPrompt || "Please review my work, record demonstrated learning, and choose the next lesson in my zone of proximal development.";
+    return `English Compass · Lesson ${lessonNumber} result
 
-Learner: Asel
-Lesson: A finished Monday story — past simple
+Learner: ${learner}
+Lesson: ${lessonTitle}
 Practice: ${state.completed.length}/${cards.length} completed
 Attempts: ${attempts}
 
-My finished story:
+My story:
 ${getStory()}
 
-Please review my past-time marker, past-simple verbs, and story order. Record demonstrated learning and choose the next lesson in my zone of proximal development.`;
+${reportPrompt}`;
   }
 
   async function finishLesson() {
@@ -160,4 +166,14 @@ Please review my past-time marker, past-simple verbs, and story order. Record de
   loadState();
   restoreView();
   document.querySelector("[data-finish-lesson]").addEventListener("click", finishLesson);
+  document.querySelectorAll("[data-speak]").forEach((button) => {
+    button.addEventListener("click", () => {
+      if (!("speechSynthesis" in window)) return;
+      window.speechSynthesis.cancel();
+      const utterance = new SpeechSynthesisUtterance(button.dataset.speak);
+      utterance.lang = "en-GB";
+      utterance.rate = 0.86;
+      window.speechSynthesis.speak(utterance);
+    });
+  });
 })();
