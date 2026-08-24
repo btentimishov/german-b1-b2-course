@@ -13,7 +13,9 @@
   const state = {
     completed: [],
     attempts: {},
-    story: {}
+    story: {},
+    answers: {},
+    mistakes: []
   };
 
   function loadState() {
@@ -23,6 +25,8 @@
       state.completed = Array.isArray(saved.completed) ? saved.completed : [];
       state.attempts = saved.attempts || {};
       state.story = saved.story || {};
+      state.answers = saved.answers || {};
+      state.mistakes = Array.isArray(saved.mistakes) ? saved.mistakes : [];
     } catch {
       // A broken saved value should never block the lesson.
     }
@@ -77,17 +81,25 @@
     document.querySelector("[data-finish-lesson]").disabled = !(state.completed.length === cards.length && storyReady);
   }
 
-  function completeCard(card, choice) {
+  function completeCard(card, choice, isCorrect) {
     const id = card.dataset.practice;
     if (!state.completed.includes(id)) state.completed.push(id);
+    if (!isCorrect && !state.mistakes.includes(id)) state.mistakes.push(id);
+    state.answers[id] = [...card.querySelectorAll(".lesson-choice")].indexOf(choice);
     card.classList.add("is-complete");
+    card.classList.toggle("has-correction", !isCorrect);
     card.querySelectorAll(".lesson-choice").forEach((button) => {
       button.disabled = true;
-      if (button === choice) button.classList.add("is-correct");
     });
+    const correctChoice = card.querySelector("[data-correct='true']");
+    correctChoice.classList.add("is-correct");
+    if (!isCorrect) choice.classList.add("is-wrong");
     const feedback = card.querySelector(".practice-feedback");
-    feedback.textContent = card.dataset.success;
-    feedback.className = "practice-feedback is-success";
+    const correctionHint = (card.dataset.retry || "Not quite.").replace(/try again\.?\s*/i, "");
+    feedback.textContent = isCorrect
+      ? card.dataset.success
+      : `${correctionHint} Correct: ${correctChoice.textContent.trim()}.`;
+    feedback.className = isCorrect ? "practice-feedback is-success" : "practice-feedback is-try-again";
     saveState();
     updateProgress();
   }
@@ -96,16 +108,7 @@
     const id = card.dataset.practice;
     if (state.completed.includes(id)) return;
     state.attempts[id] = (state.attempts[id] || 0) + 1;
-    if (choice.dataset.correct === "true") {
-      completeCard(card, choice);
-    } else {
-      choice.classList.add("is-wrong");
-      choice.disabled = true;
-      const feedback = card.querySelector(".practice-feedback");
-      feedback.textContent = card.dataset.retry;
-      feedback.className = "practice-feedback is-try-again";
-      saveState();
-    }
+    completeCard(card, choice, choice.dataset.correct === "true");
   }
 
   function restoreView() {
@@ -115,8 +118,10 @@
         choice.addEventListener("click", () => answerCard(card, choice));
       });
       if (state.completed.includes(id)) {
-        const correct = card.querySelector("[data-correct='true']");
-        completeCard(card, correct);
+        const choices = [...card.querySelectorAll(".lesson-choice")];
+        const savedIndex = state.answers[id];
+        const savedChoice = Number.isInteger(savedIndex) ? choices[savedIndex] : card.querySelector("[data-correct='true']");
+        completeCard(card, savedChoice, savedChoice.dataset.correct === "true");
       }
     });
     storyFields.forEach((field) => {
@@ -138,6 +143,7 @@ Learner: ${learner}
 Lesson: ${lessonTitle}
 Practice: ${state.completed.length}/${cards.length} completed
 Attempts: ${attempts}
+First-choice corrections shown: ${state.mistakes.length}
 
 My story:
 ${getStory()}
