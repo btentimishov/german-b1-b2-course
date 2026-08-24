@@ -1,0 +1,224 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="A playful private German A1–B1 placement journey for Akmaral, with English hints and a personal learning route.">
+    <title>Akmaral’s Deutschreise — A1 to B1 placement journey</title>
+    <link rel="stylesheet" href="../assets/course.css">
+    <script src="../assets/placement.js" defer></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main-content">Skip to the activity</a>
+
+    <div class="course-shell">
+      <header class="topbar" aria-label="Course navigation">
+        <a class="brand" href="#hero-screen" aria-label="Akmaral’s Deutschreise home">
+          <span class="roundel" aria-hidden="true"><i></i></span>
+          <span><strong>Deutschreise</strong><small>A1 → B1</small></span>
+        </a>
+        <div class="top-actions">
+          <a class="quiet-button" href="../reference/0001-a1-to-b1-linienplan.html">Route map</a>
+          <button class="quiet-button" type="button" data-reset>Start over</button>
+        </div>
+      </header>
+
+      <main id="main-content">
+        <section id="hero-screen" class="hero" aria-labelledby="hero-title">
+          <div class="hero-copy">
+            <div class="ticket-kicker"><span>AKM</span><b>Private placement journey</b><span>20</span></div>
+            <p class="eyebrow">Hallo, Akmaral!</p>
+            <h1 id="hero-title">Where does your German line begin?</h1>
+            <p class="lede">Take a small trip through everyday German. At the end, you’ll get a personal route from what you know now to confident B1.</p>
+            <ul class="feature-strip" aria-label="Assessment features">
+              <li><strong>12–15</strong><span>minutes</span></li>
+              <li><strong>20</strong><span>mini missions</span></li>
+              <li><strong>4</strong><span>skill stations</span></li>
+              <li><strong>0</strong><span>lost lives</span></li>
+            </ul>
+            <div class="hero-actions">
+              <button id="start-adventure" class="primary-button" type="button">Validate my ticket <span aria-hidden="true">→</span></button>
+              <button id="resume-adventure" class="secondary-button is-hidden" type="button">Continue saved trip</button>
+            </div>
+            <p class="privacy-note"><span aria-hidden="true">●</span> Private by design: progress stays in this browser.</p>
+          </div>
+
+          <div class="transit-poster" aria-hidden="true">
+            <p class="poster-label">LINIENPLAN / LEARNING MAP</p>
+            <svg class="route-art" viewBox="0 0 440 610" role="img">
+              <path class="route-shadow" d="M72 78 C220 78 220 198 342 198 S340 340 165 340 S94 488 337 515"></path>
+              <path class="route-main" d="M72 78 C220 78 220 198 342 198 S340 340 165 340 S94 488 337 515"></path>
+            </svg>
+            <div class="station station-a1"><span>A1</span><strong>Ankommen</strong><small>arrive</small></div>
+            <div class="station station-a2"><span>A2</span><strong>Unterwegs</strong><small>get around</small></div>
+            <div class="station station-plus"><span>A2+</span><strong>Verbinden</strong><small>connect</small></div>
+            <div class="station station-b1"><span>B1</span><strong>Mitreden</strong><small>join in</small></div>
+            <div class="passport-stamp"><span>START</span><strong>BERLIN</strong><small>DEUTSCH / 2026</small></div>
+            <p class="poster-note">Mistakes show us where to build the next station.</p>
+          </div>
+        </section>
+
+        <section id="profile-screen" class="assessment-card is-hidden" aria-labelledby="profile-title">
+          <div class="assessment-head">
+            <span class="line-badge">U1</span>
+            <div class="progress-wrap">
+              <div class="progress-labels"><span>Choose the destination</span><span>Check-in</span></div>
+              <div class="progress-track"><div class="progress-bar progress-start"></div></div>
+            </div>
+            <span class="question-count">Hallo!</span>
+          </div>
+          <div class="question-stage">
+            <p class="world-label">Before the train leaves</p>
+            <h2 id="profile-title">What should German unlock first?</h2>
+            <p class="question-context">Your choice helps the teacher put future topics in the most useful order.</p>
+            <form id="profile-form" class="profile-form">
+              <div class="field-group">
+                <label class="field-label" for="learner-name">Name <span>(you can change it)</span></label>
+                <input id="learner-name" class="text-input" name="name" autocomplete="given-name" maxlength="40" value="Akmaral">
+              </div>
+              <fieldset class="field-group goal-fieldset">
+                <legend class="choice-legend">My most important destination is…</legend>
+                <div class="goal-options">
+                  <label class="goal-chip"><input type="radio" name="goal" value="Everyday life and friendships"><span>Everyday life &amp; friendships</span></label>
+                  <label class="goal-chip"><input type="radio" name="goal" value="Travel and independence"><span>Travel &amp; independence</span></label>
+                  <label class="goal-chip"><input type="radio" name="goal" value="Study and work confidence"><span>Study &amp; work confidence</span></label>
+                  <label class="goal-chip"><input type="radio" name="goal" value="Living in a German-speaking place"><span>Living in a German-speaking place</span></label>
+                </div>
+              </fieldset>
+              <div class="question-actions">
+                <span class="lock-note">Choose honestly; guessing is okay.</span>
+                <button class="primary-button" type="submit">Board the train →</button>
+              </div>
+            </form>
+          </div>
+        </section>
+
+        <section id="quiz-screen" class="assessment-card is-hidden" aria-labelledby="question-prompt">
+          <div class="assessment-head">
+            <button id="previous-question" class="icon-button" type="button" aria-label="Previous question">←</button>
+            <div class="progress-wrap">
+              <div class="progress-labels"><span id="progress-step">Ankommen</span><span>Placement line</span></div>
+              <div class="progress-track" role="progressbar" aria-label="Placement progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+                <div id="progress-bar" class="progress-bar"></div>
+              </div>
+            </div>
+            <span id="question-count" class="question-count">1 / 20</span>
+          </div>
+
+          <div class="question-stage">
+            <p id="world-label" class="world-label">A1 · Meaning</p>
+            <h2 id="question-prompt" tabindex="-1">Question</h2>
+            <p id="question-context" class="question-context">Choose the best answer.</p>
+            <div class="prompt-tools">
+              <button id="audio-prompt" class="tool-button is-hidden" type="button"><span aria-hidden="true">▶</span> Play German</button>
+              <button id="hint-toggle" class="tool-button is-hidden" type="button" aria-expanded="false"><span aria-hidden="true">?</span> English hint</button>
+            </div>
+            <p id="hint-text" class="hint-card is-hidden" role="note"></p>
+            <div id="answer-grid" class="answer-grid" aria-label="Answer choices"></div>
+            <div class="question-actions">
+              <span class="lock-note">Answers stay neutral until the route appears.</span>
+              <button id="next-question" class="primary-button" type="button" disabled>Stamp answer →</button>
+            </div>
+          </div>
+        </section>
+
+        <section id="writing-screen" class="assessment-card is-hidden" aria-labelledby="writing-title">
+          <div class="assessment-head">
+            <button id="writing-back" class="icon-button" type="button" aria-label="Back to the last question">←</button>
+            <div class="progress-wrap">
+              <div class="progress-labels"><span>Your own voice</span><span>Final stop</span></div>
+              <div class="progress-track" role="progressbar" aria-label="Placement progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="96">
+                <div id="writing-progress-bar" class="progress-bar progress-near-end"></div>
+              </div>
+            </div>
+            <span class="question-count">Nachricht</span>
+          </div>
+
+          <div class="question-stage">
+            <p class="world-label">Final mission · Write</p>
+            <h2 id="writing-title">Send Lea a short message.</h2>
+            <div class="message-brief">
+              <span class="brief-avatar" aria-hidden="true">L</span>
+              <div>
+                <strong>Lea invited you to a picnic on Saturday.</strong>
+                <p>Write that you cannot come, explain why, suggest a different plan, and ask one question.</p>
+              </div>
+            </div>
+            <details class="english-help">
+              <summary>English task checklist</summary>
+              <ul><li>Say you cannot come.</li><li>Give a reason.</li><li>Suggest another day or activity.</li><li>Ask Lea a question.</li></ul>
+            </details>
+            <div class="field-group writing-group">
+              <label class="field-label" for="writing-answer">Write 35–70 German words. Please do not use a translator.</label>
+              <textarea id="writing-answer" class="writing-input" spellcheck="true" lang="de" placeholder="Hallo Lea, danke für die Einladung. Am Samstag…"></textarea>
+              <div class="writing-meta"><span id="word-count">0 words</span><span>Useful sample: at least 25 words</span></div>
+            </div>
+            <div class="production-check" aria-live="polite">
+              <p>Live checklist <small>(support, not a grade)</small></p>
+              <ul>
+                <li data-writing-check="length">enough language to review</li>
+                <li data-writing-check="reason">a reason with <em>weil / denn</em></li>
+                <li data-writing-check="plan">a new plan or time</li>
+                <li data-writing-check="question">one question for Lea</li>
+              </ul>
+            </div>
+            <div class="speaking-mission">
+              <div><p class="world-label">Optional · Speak</p><strong>Say the message once without reading.</strong><span>Then tick the box. Your voice is not recorded.</span></div>
+              <label class="speak-check"><input id="speaking-done" type="checkbox"><span>I tried it aloud</span></label>
+            </div>
+            <div class="question-actions">
+              <span class="lock-note">A teacher should review your original voice.</span>
+              <button id="finish-assessment" class="primary-button" type="button" disabled>Reveal my route →</button>
+            </div>
+          </div>
+        </section>
+
+        <section id="results-screen" class="results-card is-hidden" aria-labelledby="result-title">
+          <div class="results-hero">
+            <div>
+              <p id="result-eyebrow" class="eyebrow">Akmaral’s route estimate</p>
+              <h2 id="result-title">Your route is ready.</h2>
+              <p id="result-summary" class="lede">This is where the next short lesson should begin.</p>
+              <p id="result-score" class="result-score">0/20 knowledge checks</p>
+            </div>
+            <div id="level-stamp" class="level-stamp" aria-label="Estimated learning level"><span>START AT</span><strong>A2</strong><small>LEARNING ROUTE</small></div>
+          </div>
+
+          <div class="result-grid">
+            <section class="result-section" aria-labelledby="skills-title">
+              <p class="section-number">01 / PROFILE</p>
+              <h3 id="skills-title">Your line signals</h3>
+              <div id="skill-bars" class="skill-bars"></div>
+              <p id="writing-note" class="result-note">Your writing sample is ready for teacher review.</p>
+            </section>
+            <section class="result-section" aria-labelledby="route-title">
+              <p class="section-number">02 / NEXT</p>
+              <h3 id="route-title">Your first three stations</h3>
+              <ol id="next-route" class="next-route"></ol>
+            </section>
+          </div>
+
+          <details class="review-panel">
+            <summary>See the knowledge-check explanations</summary>
+            <div id="answer-review" class="answer-review"></div>
+          </details>
+
+          <div class="result-actions">
+            <button id="copy-results" class="primary-button" type="button">Copy result for my teacher</button>
+            <a class="secondary-button" href="../reference/0001-a1-to-b1-linienplan.html">Explore the A1→B1 map</a>
+            <button class="secondary-button" type="button" data-reset>Take it again</button>
+          </div>
+
+          <p class="source-note">This is a learning estimate, not a certificate. It is guided by the Council of Europe’s <a href="https://www.coe.int/en/web/common-european-framework-reference-languages/cefr-descriptors" target="_blank" rel="noreferrer">CEFR can-do descriptors</a>. For an optional official comparison, use the <a href="https://www.goethe.de/en/spr/prf/ueb.html" target="_blank" rel="noreferrer">Goethe-Institut’s free A1–B1 practice materials</a>.</p>
+        </section>
+      </main>
+
+      <footer class="lesson-footer">
+        <p>Learning design: communicative topics from <a href="https://www.busuu.com/en/it-works/busuu-methodology" target="_blank" rel="noreferrer">Busuu</a>; interactive personalization from <a href="https://blog.duolingo.com/duolingo-teaching-method/" target="_blank" rel="noreferrer">Duolingo</a>; retrieval and guidance fading from <a href="https://quizlet.com/blog/how-self-testing-drives-success" target="_blank" rel="noreferrer">Quizlet</a>; contextual short lessons and spaced review from <a href="https://www.babbel.com/spaced-repetition-language-learning" target="_blank" rel="noreferrer">Babbel</a>.</p>
+        <p>Questions or something unclear? Ask your teacher—the best course is a conversation.</p>
+      </footer>
+    </div>
+
+    <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  </body>
+</html>
