@@ -68,10 +68,83 @@
       reviewCopy: "Your result is saved exactly as answered. Replay the marked announcement once tomorrow; no corrected retry is required today.",
       followUp: "Wann beginnt dein nächster Kurs oder Arbeitstag?",
       teacherPrompt: "Please review whether Akmaral can understand and reuse precise times and changed platform information. If the evidence is stable, update the learning record and move to spoken Perfekt for Lesson 4."
+    },
+    "lesson-0004": {
+      number: "4",
+      title: "Was hast du gestern gemacht?",
+      focus: "spoken Perfekt with haben/sein, participles, and the German sentence bracket",
+      messageMinimum: 4,
+      messageChecks(value) {
+        const text = normalize(value);
+        const participles = text.match(/\b(gelernt|gearbeitet|gemacht|gebucht|gekauft|geschrieben|gelesen|gefahren|gekommen|angekommen|abgefahren|studiert|telefoniert|vorbereitet)\b/gi) || [];
+        return {
+          length: words(value) >= 30 && words(value) <= 60,
+          time: /\b(gestern|vorgestern|letzte\w*\s+woche|am\s+(montag|dienstag|mittwoch|donnerstag|freitag|samstag|sonntag)|heute\s+morgen|um\s+\d{1,2}[:.]\d{2})\b/i.test(text),
+          perfect: /\b(habe|hast|hat|haben|habt|bin|bist|ist|sind|seid)\b/i.test(text) && participles.length > 0,
+          actions: new Set(participles.map((item) => item.toLocaleLowerCase("de-DE"))).size >= 2,
+          question: /\?/.test(value)
+        };
+      },
+      messageLabels: {
+        length: "30–60 слов",
+        time: "указание времени",
+        perfect: "haben/sein + Partizip II",
+        actions: "два действия в Perfekt",
+        question: "один вопрос"
+      },
+      exitSuccess: "форма Perfekt и рамочная конструкция распознаны",
+      exitReview: "первые ответы сохранены; повтори отмеченные формы завтра",
+      ready(checks, score) {
+        return score >= 3 && checks.length && checks.perfect && checks.actions;
+      },
+      readyCopy: "Ты построила два действия в Perfekt и завершила итоговую проверку. Первые ответы сохранены как учебное свидетельство.",
+      reviewCopy: "Результат сохранён без исправленных повторов. Завтра вернись только к отмеченным формам на две минуты.",
+      followUp: "Was hast du gestern nach dem Kurs oder nach der Arbeit gemacht?",
+      teacherPrompt: "Please review whether Akmaral can independently choose haben/sein, form a useful participle, and keep the participle at the end. If stable, update the learning record and choose between weil word order and a second Perfekt retrieval lesson."
     }
   };
 
   const config = lessonConfigs[lessonId] || lessonConfigs["lesson-0002"];
+  const isRussian = document.documentElement.lang.toLocaleLowerCase().startsWith("ru");
+  const ui = isRussian ? {
+    stations: "станций",
+    stationSaved: "Станция сохранена ✓",
+    savedContinue: "Сохранено. Продолжай, когда будешь готова.",
+    correct: "Правильно:",
+    chooseEvery: "Сначала выбери по одному ответу в каждой строке.",
+    writeEvery: "Сначала напиши ответ в каждой строке.",
+    answersSaved: "Ответы сохранены ✓",
+    firstSaved: "первые ответы сохранены",
+    correctionsShown: "первые ответы сохранены; исправления показаны рядом",
+    retrieved: "формы воспроизведены — первые ответы сохранены",
+    retrievedWithHelp: "формы воспроизведены — первые ответы сохранены, исправления открыты",
+    audioUnavailable: "Немецкое аудио недоступно в этом браузере.",
+    words: "слов",
+    answerAll: (count) => `Сначала ответь на все ${count} вопроса.`,
+    resultSaved: "Результат сохранён ✓",
+    targetReached: "Цель достигнута — результат сохранён.",
+    lessonFinished: "Урок завершён — посмотри отмеченные формы.",
+    copied: "Результат урока скопирован для преподавателя."
+  } : {
+    stations: "stations",
+    stationSaved: "Station saved ✓",
+    savedContinue: "Saved. Keep moving when you’re ready.",
+    correct: "Correct:",
+    chooseEvery: "Choose one answer on every line first.",
+    writeEvery: "Write one answer on every line first.",
+    answersSaved: "Answers saved ✓",
+    firstSaved: "first choices saved",
+    correctionsShown: "first choices saved; corrections are shown beside the missed lines",
+    retrieved: "retrieved — first answers saved",
+    retrievedWithHelp: "retrieved — first answers saved and corrections revealed",
+    audioUnavailable: "German audio is unavailable in this browser.",
+    words: "words",
+    answerAll: (count) => `Answer all ${count} tickets first.`,
+    resultSaved: "Result saved ✓",
+    targetReached: "Target reached — result saved.",
+    lessonFinished: "Lesson finished — review marked.",
+    copied: "Lesson result copied for your teacher."
+  };
   const state = {
     completed: {},
     flips: [],
@@ -141,7 +214,7 @@
     const label = document.querySelector("[data-lesson-progress-label]");
     const track = fill?.parentElement;
     if (fill) fill.style.width = `${percent}%`;
-    if (label) label.textContent = `${complete}/${steps.length} stations`;
+    if (label) label.textContent = `${complete}/${steps.length} ${ui.stations}`;
     if (track) track.setAttribute("aria-valuenow", String(percent));
     steps.forEach((section) => section.classList.toggle("is-complete", Boolean(state.completed[section.dataset.lessonStep])));
   }
@@ -149,11 +222,11 @@
   function setupManualSteps() {
     document.querySelectorAll("[data-mark-step]").forEach((button) => {
       const step = button.closest("[data-lesson-step]")?.dataset.lessonStep;
-      if (state.completed[step]) button.textContent = "Station saved ✓";
+      if (state.completed[step]) button.textContent = ui.stationSaved;
       button.addEventListener("click", () => {
         markStep(step);
-        button.textContent = "Station saved ✓";
-        showToast("Saved. Keep moving when you’re ready.");
+        button.textContent = ui.stationSaved;
+        showToast(ui.savedContinue);
       });
     });
   }
@@ -187,7 +260,7 @@
     if (selected && !correct) selected.classList.add("is-wrong");
     feedback.textContent = correct
       ? (quiz.dataset.correctMessage || "Richtig.")
-      : `${(quiz.dataset.tryMessage || "Not quite.").replace(/try again\.?\s*/i, "")} Correct: ${correctButton?.textContent.trim()}`;
+      : `${(quiz.dataset.tryMessage || "Not quite.").replace(/try again\.?\s*/i, "")} ${ui.correct} ${correctButton?.textContent.trim()}`;
     feedback.className = `lesson-feedback ${correct ? "is-good" : "needs-work"}`;
   }
 
@@ -232,17 +305,17 @@
         correction.dataset.correction = "";
         row.appendChild(correction);
       }
-      correction.textContent = correct ? "✓" : `Correct: ${select.dataset.answer}`;
+      correction.textContent = correct ? "✓" : `${ui.correct} ${select.dataset.answer}`;
     });
     const result = state.scores[drillKey];
     const feedback = drill.querySelector("[data-feedback]");
     feedback.textContent = result.score === result.total
-      ? `${result.score}/${result.total} — sauber! First choices saved.`
-      : `${result.score}/${result.total} — first choices saved; corrections are shown beside the missed lines.`;
+      ? `${result.score}/${result.total} — ${isRussian ? "отлично!" : "sauber!"} ${ui.firstSaved}.`
+      : `${result.score}/${result.total} — ${ui.correctionsShown}.`;
     feedback.className = `lesson-feedback ${result.score === result.total ? "is-good" : "needs-work"}`;
     const button = drill.querySelector("[data-check-drill]");
     button.disabled = true;
-    button.textContent = "Answers saved ✓";
+    button.textContent = ui.answersSaved;
   }
 
   function setupSelectDrills() {
@@ -255,7 +328,7 @@
       button.addEventListener("click", () => {
         if (state.submitted[drillKey]) return;
         if (rows.some((select) => !select.value)) {
-          feedback.textContent = "Choose one answer on every line first.";
+          feedback.textContent = ui.chooseEvery;
           feedback.className = "lesson-feedback needs-work";
           return;
         }
@@ -286,17 +359,17 @@
       const row = input.closest(".recall-row");
       row.classList.toggle("is-right", correct);
       row.classList.toggle("is-wrong", !correct);
-      row.querySelector("[data-note]").textContent = correct ? "✓" : `Correct: ${input.dataset.answer.split("|")[0]}`;
+      row.querySelector("[data-note]").textContent = correct ? "✓" : `${ui.correct} ${input.dataset.answer.split("|")[0]}`;
     });
     const result = state.scores[recallKey];
     const feedback = set.querySelector("[data-feedback]");
     feedback.textContent = result.score === result.total
-      ? `${result.score}/${result.total} retrieved — first answers saved.`
-      : `${result.score}/${result.total} retrieved — first answers saved and corrections revealed.`;
+      ? `${result.score}/${result.total} ${ui.retrieved}.`
+      : `${result.score}/${result.total} ${ui.retrievedWithHelp}.`;
     feedback.className = `lesson-feedback ${result.score === result.total ? "is-good" : "needs-work"}`;
     const button = set.querySelector("[data-check-recall]");
     button.disabled = true;
-    button.textContent = "Answers saved ✓";
+    button.textContent = ui.answersSaved;
   }
 
   function setupRecall() {
@@ -308,7 +381,7 @@
       set.querySelector("[data-check-recall]").addEventListener("click", () => {
         if (state.submitted[recallKey]) return;
         if (inputs.some((input) => !input.value.trim())) {
-          feedback.textContent = "Write one answer on every line first.";
+          feedback.textContent = ui.writeEvery;
           feedback.className = "lesson-feedback needs-work";
           return;
         }
@@ -331,7 +404,7 @@
   function playGerman(button) {
     const text = button.dataset.speak;
     if (!("speechSynthesis" in window) || !text) {
-      showToast("German audio is unavailable in this browser.");
+      showToast(ui.audioUnavailable);
       return;
     }
     window.speechSynthesis.cancel();
@@ -359,7 +432,7 @@
     const update = () => {
       state.message = textarea.value;
       const checks = messageChecks(state.message);
-      count.textContent = `${words(state.message)} words`;
+      count.textContent = `${words(state.message)} ${ui.words}`;
       coach.querySelectorAll("[data-message-check]").forEach((item) => item.classList.toggle("is-pass", Boolean(checks[item.dataset.messageCheck])));
       if (Object.values(checks).filter(Boolean).length >= config.messageMinimum) markStep(step);
       saveState();
@@ -400,7 +473,7 @@
     feedback.className = `lesson-feedback ${score >= Math.ceil(groups.length * 0.75) ? "is-good" : "needs-work"}`;
     const button = exit.querySelector("[data-check-exit]");
     button.disabled = true;
-    button.textContent = "Result saved ✓";
+    button.textContent = ui.resultSaved;
   }
 
   function setupExitQuiz() {
@@ -412,7 +485,7 @@
     exit.querySelector("[data-check-exit]").addEventListener("click", () => {
       if (state.submitted.exit) return;
       if (groups.some((group) => !group.querySelector("input:checked"))) {
-        feedback.textContent = `Answer all ${groups.length} tickets first.`;
+        feedback.textContent = ui.answerAll(groups.length);
         feedback.className = "lesson-feedback needs-work";
         return;
       }
@@ -478,7 +551,7 @@ ${config.teacherPrompt}`;
     card.classList.remove("is-hidden");
     const checks = messageChecks(state.message);
     const ready = config.ready(checks, state.exitScore);
-    card.querySelector("[data-completion-title]").textContent = ready ? "Target reached — result saved." : "Lesson finished — review marked.";
+    card.querySelector("[data-completion-title]").textContent = ready ? ui.targetReached : ui.lessonFinished;
     card.querySelector("[data-completion-copy]").textContent = ready ? config.readyCopy : config.reviewCopy;
     if (shouldScroll) card.scrollIntoView({ behavior: "smooth", block: "center" });
   }
@@ -499,7 +572,7 @@ ${config.teacherPrompt}`;
           document.execCommand("copy");
           area.remove();
         }
-        showToast("Lesson result copied for your teacher.");
+        showToast(ui.copied);
       });
     });
   }
