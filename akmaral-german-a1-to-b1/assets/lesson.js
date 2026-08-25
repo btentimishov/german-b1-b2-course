@@ -101,30 +101,65 @@
       reviewCopy: "Результат сохранён без исправленных повторов. Завтра вернись только к отмеченным формам на две минуты.",
       followUp: "Was hast du gestern nach dem Kurs oder nach der Arbeit gemacht?",
       teacherPrompt: "Please review whether Akmaral can independently choose haben/sein, form a useful participle, and keep the participle at the end. If stable, update the learning record and choose between weil word order and a second Perfekt retrieval lesson."
+    },
+    "lesson-0005": {
+      number: "5",
+      title: "Gestern unterwegs: haben oder sein?",
+      focus: "second Perfekt retrieval with haben/sein, useful participles, and the sentence bracket",
+      messageMinimum: 5,
+      messageChecks(value) {
+        const text = normalize(value);
+        const participles = text.match(/\b(gespielt|gelernt|gearbeitet|gemacht|gekauft|gekocht|gefahren|gegangen|gekommen|angekommen|telefoniert)\b/gi) || [];
+        return {
+          length: words(value) >= 35 && words(value) <= 65,
+          time: /\b(gestern|vorgestern|am\s+(montag|dienstag|mittwoch|donnerstag|freitag|samstag|sonntag)|am\s+abend|am\s+morgen|um\s+\d{1,2}[:.]?\d{0,2})\b/i.test(text),
+          haben: /\b(habe|hast|hat|haben|habt)\b[^.!?]{0,100}\b(gespielt|gelernt|gearbeitet|gemacht|gekauft|gekocht|telefoniert)\b/i.test(text),
+          sein: /\b(bin|bist|ist|sind|seid)\b[^.!?]{0,100}\b(gefahren|gegangen|gekommen|angekommen)\b/i.test(text),
+          actions: new Set(participles.map((item) => item.toLocaleLowerCase("de-DE"))).size >= 3,
+          question: /\?/.test(value)
+        };
+      },
+      messageLabels: {
+        length: "35–65 слов",
+        time: "когда это было",
+        haben: "одно действие с haben",
+        sein: "одно перемещение с sein",
+        actions: "три действия в Perfekt",
+        question: "вопрос собеседнику"
+      },
+      exitSuccess: "выбор haben/sein и порядок слов стали увереннее",
+      exitReview: "первые ответы учтены; завтра повтори только отмеченные конструкции",
+      ready(checks, score) {
+        return score >= 3 && checks.length && checks.haben && checks.sein && checks.actions;
+      },
+      readyCopy: "Ты использовала в своём сообщении и haben, и sein, а затем прошла итоговую проверку. Первые ответы учтены без пересдачи.",
+      reviewCopy: "Урок завершён. Первые ответы сохранены, а правильные варианты показаны рядом — исправлять их повторно не нужно.",
+      followUp: "Was hast du gestern gemacht, und wie bist du nach Hause gekommen?",
+      teacherPrompt: "Please review whether Akmaral now independently keeps haben with ordinary actions, sein with movement from A to B, and the participle at the end. Advance to weil word order only if this is stable in her original message; otherwise choose one more short mixed Perfekt retrieval task."
     }
   };
 
   const config = lessonConfigs[lessonId] || lessonConfigs["lesson-0002"];
   const isRussian = document.documentElement.lang.toLocaleLowerCase().startsWith("ru");
   const ui = isRussian ? {
-    stations: "станций",
-    stationSaved: "Станция сохранена ✓",
-    savedContinue: "Сохранено. Продолжай, когда будешь готова.",
-    correct: "Правильно:",
-    chooseEvery: "Сначала выбери по одному ответу в каждой строке.",
-    writeEvery: "Сначала напиши ответ в каждой строке.",
-    answersSaved: "Ответы сохранены ✓",
-    firstSaved: "первые ответы сохранены",
-    correctionsShown: "первые ответы сохранены; исправления показаны рядом",
-    retrieved: "формы воспроизведены — первые ответы сохранены",
-    retrievedWithHelp: "формы воспроизведены — первые ответы сохранены, исправления открыты",
-    audioUnavailable: "Немецкое аудио недоступно в этом браузере.",
+    stations: "этапов",
+    stationSaved: "Готово ✓",
+    savedContinue: "Готово. Можно идти дальше.",
+    correct: "Правильный ответ:",
+    chooseEvery: "Сначала выбери ответ в каждой строке.",
+    writeEvery: "Сначала заполни все поля.",
+    answersSaved: "Ответы приняты ✓",
+    firstSaved: "первые ответы учтены",
+    correctionsShown: "первые ответы учтены; правильные варианты показаны рядом",
+    retrieved: "готово — первые ответы учтены",
+    retrievedWithHelp: "готово — первые ответы учтены, правильные варианты показаны рядом",
+    audioUnavailable: "В этом браузере не удалось включить немецкую озвучку.",
     words: "слов",
-    answerAll: (count) => `Сначала ответь на все ${count} вопроса.`,
-    resultSaved: "Результат сохранён ✓",
-    targetReached: "Цель достигнута — результат сохранён.",
-    lessonFinished: "Урок завершён — посмотри отмеченные формы.",
-    copied: "Результат урока скопирован для преподавателя."
+    answerAll: (count) => `Сначала ответь на все вопросы (${count}).`,
+    resultSaved: "Результат готов ✓",
+    targetReached: "Отлично, цель урока достигнута.",
+    lessonFinished: "Урок завершён. Посмотри правильные варианты.",
+    copied: "Результат скопирован. Отправь его преподавателю."
   } : {
     stations: "stations",
     stationSaved: "Station saved ✓",

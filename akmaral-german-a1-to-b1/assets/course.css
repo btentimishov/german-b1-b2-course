@@ -363,6 +363,7 @@ h3 { font-size: 1.75rem; letter-spacing: -0.025em; }
 .noun-passports { display: grid; grid-template-columns: repeat(3, 1fr); gap: 13px; margin: 28px 0; }
 .noun-passport { position: relative; min-height: 118px; padding: 20px; border: 2px solid white; background: white; box-shadow: 4px 4px 0 var(--lime); color: var(--ink); cursor: pointer; overflow: hidden; }
 .noun-passport::after { position: absolute; right: 9px; bottom: 7px; color: var(--blue); content: "TAP ↻"; font-size: 0.52rem; font-weight: 900; letter-spacing: 0.1em; }
+html[lang="ru"] .noun-passport::after { content: "НАЖМИ ↻"; }
 .noun-passport span, .noun-passport b { position: absolute; inset: 0; display: grid; place-items: center; padding: 18px; font-family: var(--display); font-size: 1.65rem; transition: opacity 160ms ease, transform 160ms ease; }
 .noun-passport b { background: var(--lime); opacity: 0; transform: rotateX(90deg); }
 .noun-passport.is-revealed span { opacity: 0; transform: rotateX(-90deg); }
