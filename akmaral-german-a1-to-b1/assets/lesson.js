@@ -3,24 +3,103 @@
 
   const lessonId = document.body.dataset.lessonId || "lesson";
   const storeKey = `akmaral-deutschreise-${lessonId}-v1`;
+  const normalize = (value) => value.trim().toLocaleLowerCase("de-DE").replace(/[.!?]+$/g, "").replace(/\s+/g, " ");
+  const words = (value) => value.trim() ? value.trim().split(/\s+/).length : 0;
+
+  const lessonConfigs = {
+    "lesson-0002": {
+      number: "2",
+      title: "Ich habe einen Termin",
+      focus: "masculine accusative in study and work schedules",
+      messageMinimum: 3,
+      messageChecks(value) {
+        const text = normalize(value);
+        return {
+          length: words(value) >= 25 && words(value) <= 55,
+          object: /\beinen\s+(termin|kurs|test|bericht|laptop|job|arzttermin|arzt)\b/i.test(text),
+          schedule: /\b(am\s+(montag|dienstag|mittwoch|donnerstag|freitag|samstag|sonntag)|heute|morgen|um\s+\d{1,2})\b/i.test(text),
+          next: /\?/.test(value) || /\b(können|kannst|passt|treffen|zeit)\b/i.test(text)
+        };
+      },
+      messageLabels: {
+        length: "25–55 words",
+        object: "einen + masculine study/work noun",
+        schedule: "day/time phrase",
+        next: "next step or question"
+      },
+      exitSuccess: "the einen pattern appeared in most of the independent checks",
+      exitReview: "the first choices are saved; use the revealed corrections for tomorrow’s review",
+      ready(checks, score) {
+        return score >= 3 && checks.length && checks.object;
+      },
+      readyCopy: "You produced einen in an original message and completed the exit ticket. Your first answers—not corrected retries—are the evidence.",
+      reviewCopy: "Your result is saved exactly as answered. Use the marked corrections for a short review; you do not need to replace them to finish.",
+      followUp: "Was hast du diese Woche in der Uni oder bei der Arbeit?",
+      teacherPrompt: "Please review whether she can produce der → einen without a visible model. If yes, update the learning record and choose between time/listening practice and spoken Perfekt for Lesson 3."
+    },
+    "lesson-0003": {
+      number: "3",
+      title: "Achtung, Gleis neun!",
+      focus: "times, platforms, and changed travel announcements",
+      messageMinimum: 4,
+      messageChecks(value) {
+        const text = normalize(value);
+        return {
+          length: words(value) >= 20 && words(value) <= 50,
+          time: /\b(um\s+)?\d{1,2}[:.]\d{2}\b|\b(zehn|elf|zwölf|dreizehn|vierzehn|fünfzehn|sechzehn|siebzehn|achtzehn)\s+uhr\b/i.test(text),
+          route: /\b(einen\s+zug|zug|gleis|raum|bus|bahn)\b/i.test(text),
+          response: /\b(kann|komme|nehme|passt|leider|ja|erreiche)\b/i.test(text),
+          question: /\?/.test(value)
+        };
+      },
+      messageLabels: {
+        length: "20–50 words",
+        time: "precise time",
+        route: "train/platform/room detail",
+        response: "clear response",
+        question: "one question"
+      },
+      exitSuccess: "the key time and platform details were understood",
+      exitReview: "the first choices are saved; replay the marked announcement tomorrow",
+      ready(checks, score) {
+        return score >= 3 && checks.length && checks.time && checks.route;
+      },
+      readyCopy: "You understood the main travel details and used a precise time in your own message. Your first answers are preserved as evidence.",
+      reviewCopy: "Your result is saved exactly as answered. Replay the marked announcement once tomorrow; no corrected retry is required today.",
+      followUp: "Wann beginnt dein nächster Kurs oder Arbeitstag?",
+      teacherPrompt: "Please review whether Akmaral can understand and reuse precise times and changed platform information. If the evidence is stable, update the learning record and move to spoken Perfekt for Lesson 4."
+    }
+  };
+
+  const config = lessonConfigs[lessonId] || lessonConfigs["lesson-0002"];
   const state = {
     completed: {},
     flips: [],
     attempts: {},
+    answers: {},
+    scores: {},
+    submitted: {},
+    mistakes: [],
     message: "",
     speaking: false,
     exitAnswers: {},
     exitScore: null
   };
 
-  const normalize = (value) => value.trim().toLocaleLowerCase("de-DE").replace(/[.!?]+$/g, "").replace(/\s+/g, " ");
-  const words = (value) => value.trim() ? value.trim().split(/\s+/).length : 0;
-
   function loadState() {
     try {
       const saved = JSON.parse(localStorage.getItem(storeKey));
       if (!saved) return;
       Object.assign(state, saved);
+      state.completed = state.completed || {};
+      state.flips = Array.isArray(state.flips) ? state.flips : [];
+      state.attempts = state.attempts || {};
+      state.answers = state.answers || {};
+      state.scores = state.scores || {};
+      state.submitted = state.submitted || {};
+      state.mistakes = Array.isArray(state.mistakes) ? state.mistakes : [];
+      state.exitAnswers = state.exitAnswers || {};
+      if (state.exitScore !== null && Object.keys(state.exitAnswers).length) state.submitted.exit = true;
     } catch {
       // The lesson still works without storage.
     }
@@ -32,6 +111,10 @@
     } catch {
       // The lesson still works without storage.
     }
+  }
+
+  function addMistake(key) {
+    if (!state.mistakes.includes(key)) state.mistakes.push(key);
   }
 
   function showToast(message) {
@@ -86,91 +169,160 @@
         saveState();
       });
     });
-    if (cards.length && state.flips.length === cards.length) {
-      markStep(cards[0].closest("[data-lesson-step]")?.dataset.lessonStep);
-    }
+    if (cards.length && state.flips.length === cards.length) markStep(cards[0].closest("[data-lesson-step]")?.dataset.lessonStep);
+  }
+
+  function renderChoice(quiz, quizKey) {
+    const buttons = [...quiz.querySelectorAll("button[data-correct]")];
+    const feedback = quiz.querySelector("[data-feedback]");
+    const savedIndex = state.answers[quizKey];
+    const selected = Number.isInteger(savedIndex) ? buttons[savedIndex] : null;
+    const correctButton = buttons.find((button) => button.dataset.correct === "true");
+    const correct = selected?.dataset.correct === "true";
+    buttons.forEach((button) => {
+      button.disabled = true;
+      button.classList.remove("is-right", "is-wrong");
+    });
+    correctButton?.classList.add("is-right");
+    if (selected && !correct) selected.classList.add("is-wrong");
+    feedback.textContent = correct
+      ? (quiz.dataset.correctMessage || "Richtig.")
+      : `${(quiz.dataset.tryMessage || "Not quite.").replace(/try again\.?\s*/i, "")} Correct: ${correctButton?.textContent.trim()}`;
+    feedback.className = `lesson-feedback ${correct ? "is-good" : "needs-work"}`;
   }
 
   function setupChoiceQuizzes() {
     document.querySelectorAll("[data-choice-quiz]").forEach((quiz, quizIndex) => {
-      const feedback = quiz.querySelector("[data-feedback]");
       const step = quiz.closest("[data-lesson-step]")?.dataset.lessonStep;
       const quizKey = `choice-${quizIndex}`;
-      quiz.querySelectorAll("button[data-correct]").forEach((button) => {
+      const buttons = [...quiz.querySelectorAll("button[data-correct]")];
+      if (state.submitted[quizKey]) renderChoice(quiz, quizKey);
+      buttons.forEach((button, buttonIndex) => {
         button.addEventListener("click", () => {
-          state.attempts[quizKey] = (state.attempts[quizKey] || 0) + 1;
+          if (state.submitted[quizKey]) return;
           const correct = button.dataset.correct === "true";
-          quiz.querySelectorAll("button[data-correct]").forEach((option) => option.classList.remove("is-right", "is-wrong"));
-          button.classList.add(correct ? "is-right" : "is-wrong");
-          if (correct) {
-            quiz.dataset.solved = "true";
-            feedback.textContent = quiz.dataset.correctMessage || "Richtig — the noun passport changed to einen.";
-            feedback.className = "lesson-feedback is-good";
-          } else {
-            feedback.textContent = quiz.dataset.tryMessage || "Not yet. Find the masculine object: der changes to einen.";
-            feedback.className = "lesson-feedback needs-work";
-          }
+          state.attempts[quizKey] = 1;
+          state.answers[quizKey] = buttonIndex;
+          state.scores[quizKey] = { score: correct ? 1 : 0, total: 1 };
+          state.submitted[quizKey] = true;
+          if (!correct) addMistake(quizKey);
+          renderChoice(quiz, quizKey);
           const sectionQuizzes = [...quiz.closest("[data-lesson-step]").querySelectorAll("[data-choice-quiz]")];
-          if (sectionQuizzes.every((item) => item.dataset.solved === "true")) markStep(step);
+          const sectionReady = sectionQuizzes.every((item) => state.submitted[`choice-${[...document.querySelectorAll("[data-choice-quiz]")].indexOf(item)}`]);
+          if (sectionReady) markStep(step);
           saveState();
         });
       });
     });
   }
 
+  function renderSelectDrill(drill, drillKey) {
+    const rows = [...drill.querySelectorAll("select[data-answer]")];
+    const saved = state.answers[drillKey] || [];
+    rows.forEach((select, rowIndex) => {
+      select.value = saved[rowIndex] || "";
+      select.disabled = true;
+      const correct = normalize(select.value) === normalize(select.dataset.answer);
+      const row = select.closest(".practice-row");
+      row.classList.toggle("is-right", correct);
+      row.classList.toggle("is-wrong", !correct);
+      let correction = row.querySelector("[data-correction]");
+      if (!correction) {
+        correction = document.createElement("small");
+        correction.dataset.correction = "";
+        row.appendChild(correction);
+      }
+      correction.textContent = correct ? "✓" : `Correct: ${select.dataset.answer}`;
+    });
+    const result = state.scores[drillKey];
+    const feedback = drill.querySelector("[data-feedback]");
+    feedback.textContent = result.score === result.total
+      ? `${result.score}/${result.total} — sauber! First choices saved.`
+      : `${result.score}/${result.total} — first choices saved; corrections are shown beside the missed lines.`;
+    feedback.className = `lesson-feedback ${result.score === result.total ? "is-good" : "needs-work"}`;
+    const button = drill.querySelector("[data-check-drill]");
+    button.disabled = true;
+    button.textContent = "Answers saved ✓";
+  }
+
   function setupSelectDrills() {
     document.querySelectorAll("[data-select-drill]").forEach((drill, drillIndex) => {
+      const drillKey = `drill-${drillIndex}`;
       const button = drill.querySelector("[data-check-drill]");
       const feedback = drill.querySelector("[data-feedback]");
-      const rows = [...drill.querySelectorAll("[data-answer]")];
+      const rows = [...drill.querySelectorAll("select[data-answer]")];
+      if (state.submitted[drillKey]) renderSelectDrill(drill, drillKey);
       button.addEventListener("click", () => {
-        let score = 0;
-        rows.forEach((select) => {
-          const correct = normalize(select.value) === normalize(select.dataset.answer);
-          const row = select.closest(".practice-row");
-          row.classList.toggle("is-right", correct);
-          row.classList.toggle("is-wrong", !correct);
-          if (correct) score += 1;
+        if (state.submitted[drillKey]) return;
+        if (rows.some((select) => !select.value)) {
+          feedback.textContent = "Choose one answer on every line first.";
+          feedback.className = "lesson-feedback needs-work";
+          return;
+        }
+        const answers = rows.map((select) => select.value);
+        const score = rows.filter((select) => normalize(select.value) === normalize(select.dataset.answer)).length;
+        state.attempts[drillKey] = 1;
+        state.answers[drillKey] = answers;
+        state.scores[drillKey] = { score, total: rows.length };
+        state.submitted[drillKey] = true;
+        rows.forEach((select, rowIndex) => {
+          if (normalize(select.value) !== normalize(select.dataset.answer)) addMistake(`${drillKey}-${rowIndex}`);
         });
-        state.attempts[`drill-${drillIndex}`] = (state.attempts[`drill-${drillIndex}`] || 0) + 1;
-        feedback.textContent = score === rows.length
-          ? `${score}/${rows.length} — sauber! Say the six phrases aloud once.`
-          : `${score}/${rows.length} — check noun gender first, then ask whether it is the action target.`;
-        feedback.className = `lesson-feedback ${score === rows.length ? "is-good" : "needs-work"}`;
-        if (score === rows.length) markStep(drill.closest("[data-lesson-step]")?.dataset.lessonStep);
+        renderSelectDrill(drill, drillKey);
+        markStep(drill.closest("[data-lesson-step]")?.dataset.lessonStep);
         saveState();
       });
     });
   }
 
+  function renderRecall(set, recallKey) {
+    const inputs = [...set.querySelectorAll("input[data-answer]")];
+    const saved = state.answers[recallKey] || [];
+    inputs.forEach((input, inputIndex) => {
+      input.value = saved[inputIndex] || "";
+      input.disabled = true;
+      const accepted = input.dataset.answer.split("|").map(normalize);
+      const correct = accepted.includes(normalize(input.value));
+      const row = input.closest(".recall-row");
+      row.classList.toggle("is-right", correct);
+      row.classList.toggle("is-wrong", !correct);
+      row.querySelector("[data-note]").textContent = correct ? "✓" : `Correct: ${input.dataset.answer.split("|")[0]}`;
+    });
+    const result = state.scores[recallKey];
+    const feedback = set.querySelector("[data-feedback]");
+    feedback.textContent = result.score === result.total
+      ? `${result.score}/${result.total} retrieved — first answers saved.`
+      : `${result.score}/${result.total} retrieved — first answers saved and corrections revealed.`;
+    feedback.className = `lesson-feedback ${result.score === result.total ? "is-good" : "needs-work"}`;
+    const button = set.querySelector("[data-check-recall]");
+    button.disabled = true;
+    button.textContent = "Answers saved ✓";
+  }
+
   function setupRecall() {
     document.querySelectorAll("[data-recall-set]").forEach((set, setIndex) => {
+      const recallKey = `recall-${setIndex}`;
       const inputs = [...set.querySelectorAll("input[data-answer]")];
       const feedback = set.querySelector("[data-feedback]");
+      if (state.submitted[recallKey]) renderRecall(set, recallKey);
       set.querySelector("[data-check-recall]").addEventListener("click", () => {
-        let score = 0;
+        if (state.submitted[recallKey]) return;
+        if (inputs.some((input) => !input.value.trim())) {
+          feedback.textContent = "Write one answer on every line first.";
+          feedback.className = "lesson-feedback needs-work";
+          return;
+        }
+        const answers = inputs.map((input) => input.value);
+        const score = inputs.filter((input) => input.dataset.answer.split("|").map(normalize).includes(normalize(input.value))).length;
+        state.attempts[recallKey] = 1;
+        state.answers[recallKey] = answers;
+        state.scores[recallKey] = { score, total: inputs.length };
+        state.submitted[recallKey] = true;
         inputs.forEach((input, inputIndex) => {
-          const key = `recall-${setIndex}-${inputIndex}`;
-          const answers = input.dataset.answer.split("|").map(normalize);
-          const correct = answers.includes(normalize(input.value));
-          const row = input.closest(".recall-row");
-          row.classList.toggle("is-right", correct);
-          row.classList.toggle("is-wrong", !correct);
-          if (correct) {
-            score += 1;
-            row.querySelector("[data-note]").textContent = "✓";
-          } else {
-            state.attempts[key] = (state.attempts[key] || 0) + 1;
-            row.querySelector("[data-note]").textContent = state.attempts[key] >= 2
-              ? `Answer: ${input.dataset.answer.split("|")[0]}`
-              : "Try again: masculine object → einen …";
-          }
+          if (!input.dataset.answer.split("|").map(normalize).includes(normalize(input.value))) addMistake(`${recallKey}-${inputIndex}`);
         });
-        feedback.textContent = score === inputs.length
-          ? "All three recalled without a visible model — strong storage practice."
-          : `${score}/${inputs.length} retrieved. Wait ten seconds, then try the missed line again.`;
-        feedback.className = `lesson-feedback ${score === inputs.length ? "is-good" : "needs-work"}`;
-        if (score === inputs.length) markStep(set.closest("[data-lesson-step]")?.dataset.lessonStep);
+        renderRecall(set, recallKey);
+        markStep(set.closest("[data-lesson-step]")?.dataset.lessonStep);
         saveState();
       });
     });
@@ -185,7 +337,7 @@
     window.speechSynthesis.cancel();
     const utterance = new SpeechSynthesisUtterance(text);
     utterance.lang = "de-DE";
-    utterance.rate = 0.78;
+    utterance.rate = Number(button.dataset.rate || 0.78);
     window.speechSynthesis.speak(utterance);
   }
 
@@ -194,13 +346,7 @@
   }
 
   function messageChecks(value) {
-    const text = normalize(value);
-    return {
-      length: words(value) >= 25 && words(value) <= 55,
-      object: /\beinen\s+(termin|kurs|test|bericht|laptop|job)\b/i.test(text),
-      schedule: /\b(am\s+(montag|dienstag|mittwoch|donnerstag|freitag|samstag|sonntag)|heute|morgen|um\s+\d{1,2})\b/i.test(text),
-      next: /\?/.test(value) || /\b(können|kannst|passt|treffen|zeit)\b/i.test(text)
-    };
+    return config.messageChecks(value);
   }
 
   function setupMessageCoach() {
@@ -214,14 +360,15 @@
       state.message = textarea.value;
       const checks = messageChecks(state.message);
       count.textContent = `${words(state.message)} words`;
-      coach.querySelectorAll("[data-message-check]").forEach((item) => item.classList.toggle("is-pass", checks[item.dataset.messageCheck]));
-      if (Object.values(checks).filter(Boolean).length >= 3) markStep(step);
+      coach.querySelectorAll("[data-message-check]").forEach((item) => item.classList.toggle("is-pass", Boolean(checks[item.dataset.messageCheck])));
+      if (Object.values(checks).filter(Boolean).length >= config.messageMinimum) markStep(step);
       saveState();
     };
     textarea.addEventListener("input", update);
     update();
 
     const speaking = coach.querySelector("[data-speaking]");
+    if (!speaking) return;
     speaking.checked = state.speaking;
     speaking.addEventListener("change", () => {
       state.speaking = speaking.checked;
@@ -229,14 +376,43 @@
     });
   }
 
+  function renderExit(exit) {
+    const groups = [...exit.querySelectorAll("[data-exit-group]")];
+    groups.forEach((group, groupIndex) => {
+      const savedValue = state.exitAnswers[groupIndex];
+      const radios = [...group.querySelectorAll("input[type='radio']")];
+      const selected = radios.find((radio) => radio.value === savedValue);
+      if (selected) selected.checked = true;
+      const correct = selected?.dataset.correct === "true";
+      group.classList.toggle("is-right", Boolean(correct));
+      group.classList.toggle("is-wrong", Boolean(selected) && !correct);
+      radios.forEach((radio) => {
+        radio.disabled = true;
+        radio.closest("label")?.classList.remove("is-correction");
+      });
+      if (selected && !correct) group.querySelector("input[data-correct='true']")?.closest("label")?.classList.add("is-correction");
+    });
+    const score = state.exitScore ?? 0;
+    const feedback = exit.querySelector("[data-feedback]");
+    feedback.textContent = score >= Math.ceil(groups.length * 0.75)
+      ? `${score}/${groups.length} — ${config.exitSuccess}.`
+      : `${score}/${groups.length} — ${config.exitReview}.`;
+    feedback.className = `lesson-feedback ${score >= Math.ceil(groups.length * 0.75) ? "is-good" : "needs-work"}`;
+    const button = exit.querySelector("[data-check-exit]");
+    button.disabled = true;
+    button.textContent = "Result saved ✓";
+  }
+
   function setupExitQuiz() {
     const exit = document.querySelector("[data-exit-quiz]");
     if (!exit) return;
     const feedback = exit.querySelector("[data-feedback]");
+    const groups = [...exit.querySelectorAll("[data-exit-group]")];
+    if (state.submitted.exit) renderExit(exit);
     exit.querySelector("[data-check-exit]").addEventListener("click", () => {
-      const groups = [...exit.querySelectorAll("[data-exit-group]")];
+      if (state.submitted.exit) return;
       if (groups.some((group) => !group.querySelector("input:checked"))) {
-        feedback.textContent = "Answer all four tickets first.";
+        feedback.textContent = `Answer all ${groups.length} tickets first.`;
         feedback.className = "lesson-feedback needs-work";
         return;
       }
@@ -245,44 +421,55 @@
         const selected = group.querySelector("input:checked");
         const correct = selected.dataset.correct === "true";
         state.exitAnswers[groupIndex] = selected.value;
-        group.classList.toggle("is-right", correct);
-        group.classList.toggle("is-wrong", !correct);
         if (correct) score += 1;
+        else addMistake(`exit-${groupIndex}`);
       });
+      state.attempts.exit = 1;
       state.exitScore = score;
-      feedback.textContent = score >= 3
-        ? `${score}/4 — the einen pattern is ready for a real message.`
-        : `${score}/4 — reopen the noun passports, then retrieve the four answers once more.`;
-      feedback.className = `lesson-feedback ${score >= 3 ? "is-good" : "needs-work"}`;
-      if (score >= 3) markStep(exit.closest("[data-lesson-step]")?.dataset.lessonStep);
+      state.scores.exit = { score, total: groups.length };
+      state.submitted.exit = true;
+      markStep(exit.closest("[data-lesson-step]")?.dataset.lessonStep);
+      renderExit(exit);
       renderCompletion(true);
       saveState();
     });
   }
 
+  function scoreSummary(prefix) {
+    const results = Object.entries(state.scores).filter(([key]) => key.startsWith(prefix)).map(([, value]) => value);
+    if (!results.length) return "not completed";
+    const score = results.reduce((sum, item) => sum + item.score, 0);
+    const total = results.reduce((sum, item) => sum + item.total, 0);
+    return `${score}/${total}`;
+  }
+
   function buildReport() {
     const checks = messageChecks(state.message);
-    const attempts = Object.values(state.attempts).reduce((sum, count) => sum + count, 0);
-    return `Akmaral’s Deutschreise — Lesson 2 result
+    const interactions = Object.values(state.attempts).reduce((sum, count) => sum + Number(count || 0), 0);
+    const checkLines = Object.entries(config.messageLabels).map(([key, label]) => `- ${label}: ${checks[key] ? "yes" : "not yet"}`).join("\n");
+    return `Akmaral’s Deutschreise — Lesson ${config.number} result
 
-Lesson: Ich habe einen Termin
-Focus: masculine accusative in study and work schedules
-Exit ticket: ${state.exitScore ?? "not completed"}/4
-Practice attempts recorded: ${attempts}
-Speaking mission attempted: ${state.speaking ? "yes" : "no"}
+Lesson: ${config.title}
+Focus: ${config.focus}
+
+First-answer evidence:
+- First-choice checks: ${scoreSummary("choice-")}
+- Controlled practice: ${scoreSummary("drill-")}
+- Typed recall: ${scoreSummary("recall-")}
+- Exit ticket: ${state.exitScore ?? "not completed"}/${state.scores.exit?.total || document.querySelectorAll("[data-exit-group]").length || 4}
+- Corrections revealed: ${state.mistakes.length}
+- Practice interactions recorded: ${interactions}
+- Speaking mission attempted: ${state.speaking ? "yes" : "no"}
 
 Message support checks:
-- 25–55 words: ${checks.length ? "yes" : "not yet"}
-- einen + masculine study/work noun: ${checks.object ? "yes" : "not yet"}
-- day/time phrase: ${checks.schedule ? "yes" : "not yet"}
-- next step or question: ${checks.next ? "yes" : "not yet"}
+${checkLines}
 
 Original message (${words(state.message)} words):
 ${state.message || "No message submitted."}
 
-Ask Akmaral: „Was hast du diese Woche in der Uni oder bei der Arbeit?“
+Ask Akmaral: „${config.followUp}“
 
-Please review whether she can produce der → einen without a visible model. If yes, update the learning record and choose between time/listening practice and spoken Perfekt for Lesson 3.`;
+${config.teacherPrompt}`;
   }
 
   function renderCompletion(shouldScroll = false) {
@@ -290,11 +477,9 @@ Please review whether she can produce der → einen without a visible model. If 
     if (!card || state.exitScore === null) return;
     card.classList.remove("is-hidden");
     const checks = messageChecks(state.message);
-    const ready = state.exitScore >= 3 && checks.length && checks.object;
-    card.querySelector("[data-completion-title]").textContent = ready ? "Station complete." : "One more short loop.";
-    card.querySelector("[data-completion-copy]").textContent = ready
-      ? "You used the masculine object pattern in retrieval and your own study/work message. Copy the result for your teacher."
-      : "Review the noun passports, improve the message, and try the exit ticket again. Mistakes stay useful.";
+    const ready = config.ready(checks, state.exitScore);
+    card.querySelector("[data-completion-title]").textContent = ready ? "Target reached — result saved." : "Lesson finished — review marked.";
+    card.querySelector("[data-completion-copy]").textContent = ready ? config.readyCopy : config.reviewCopy;
     if (shouldScroll) card.scrollIntoView({ behavior: "smooth", block: "center" });
   }
 
