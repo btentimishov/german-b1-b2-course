@@ -136,6 +136,41 @@
       reviewCopy: "Урок завершён. Первые ответы сохранены, а правильные варианты показаны рядом — исправлять их повторно не нужно.",
       followUp: "Was hast du gestern gemacht, und wie bist du nach Hause gekommen?",
       teacherPrompt: "Please review whether Akmaral now independently keeps haben with ordinary actions, sein with movement from A to B, and the participle at the end. Advance to weil word order only if this is stable in her original message; otherwise choose one more short mixed Perfekt retrieval task."
+    },
+    "lesson-0006": {
+      number: "6",
+      title: "Perfekt-Kurzcheck: gemacht oder gelaufen?",
+      focus: "short mixed Perfekt retrieval with machen, laufen, erreichen, and fahren",
+      messageMinimum: 4,
+      messageChecks(value) {
+        const text = normalize(value);
+        const participles = text.match(/\b(gemacht|gelernt|gearbeitet|erreicht|gelaufen|gefahren|gegangen|gekommen)\b/gi) || [];
+        return {
+          length: words(value) >= 25 && words(value) <= 50,
+          time: /\b(gestern|vorgestern|am\s+(montag|dienstag|mittwoch|donnerstag|freitag|samstag|sonntag)|am\s+abend|am\s+morgen|um\s+\d{1,2}[:.]?\d{0,2})\b/i.test(text),
+          haben: /\b(habe|hast|hat|haben|habt)\b[^.!?]{0,100}\b(gemacht|gelernt|gearbeitet|erreicht)\b/i.test(text),
+          sein: /\b(bin|bist|ist|sind|seid)\b[^.!?]{0,100}\b(gelaufen|gefahren|gegangen|gekommen)\b/i.test(text),
+          actions: new Set(participles.map((item) => item.toLocaleLowerCase("de-DE"))).size >= 3,
+          question: /\?/.test(value)
+        };
+      },
+      messageLabels: {
+        length: "25–50 слов",
+        time: "когда это было",
+        haben: "действие с haben",
+        sein: "перемещение с sein",
+        actions: "три действия в Perfekt",
+        question: "вопрос собеседнику"
+      },
+      exitSuccess: "четыре смешанные конструкции Perfekt извлечены увереннее",
+      exitReview: "первые ответы учтены; повтори только отмеченные конструкции",
+      ready(checks, score) {
+        return score >= 3 && checks.length && checks.haben && checks.sein && checks.actions;
+      },
+      readyCopy: "Ты снова использовала haben и sein в новом сообщении и закончила короткую проверку. Первые ответы сохранены как свидетельство.",
+      reviewCopy: "Короткая проверка завершена. Первые ответы сохранены, а нужные исправления показаны рядом.",
+      followUp: "Was hast du gestern gemacht, und wie bist du nach Hause gekommen?",
+      teacherPrompt: "Please review only the new original message. Advance to weil word order if ordinary actions keep haben, movement keeps sein, and the participle remains at the end; otherwise recycle Perfekt briefly inside a new real-life topic rather than adding another full Perfekt lesson."
     }
   };
 

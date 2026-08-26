@@ -42,6 +42,7 @@ function decodeHtml(value) {
 async function validateHtml(file) {
   const html = await readFile(file, "utf8");
   const relativeFile = path.relative(repositoryRoot, file);
+  const semanticAuditRequired = /\bdata-semantic-audit(?:="[^"]*")?/.test(html);
   const ids = [...html.matchAll(/\bid="([^"]+)"/g)].map((match) => match[1]);
   const duplicateIds = ids.filter((id, index) => ids.indexOf(id) !== index);
   if (duplicateIds.length) errors.push(`${relativeFile}: duplicate ids ${[...new Set(duplicateIds)].join(", ")}`);
@@ -50,6 +51,12 @@ async function validateHtml(file) {
     const answerMatch = selectMatch[1].match(/\bdata-answer="([^"]+)"/);
     if (!answerMatch) continue;
     answerCount += 1;
+    if (semanticAuditRequired && !/\bdata-prompt="[^"]+"/.test(selectMatch[1])) {
+      errors.push(`${relativeFile}: fixed answer "${decodeHtml(answerMatch[1]).trim()}" has no data-prompt`);
+    }
+    if (semanticAuditRequired && !/\bdata-explanation="[^"]+"/.test(selectMatch[1])) {
+      errors.push(`${relativeFile}: fixed answer "${decodeHtml(answerMatch[1]).trim()}" has no data-explanation`);
+    }
     const answer = decodeHtml(answerMatch[1]).trim();
     const options = [...selectMatch[2].matchAll(/<option(?:\s[^>]*)?>([\s\S]*?)<\/option>/g)]
       .map((match) => decodeHtml(match[1].replace(/<[^>]+>/g, "")).trim());

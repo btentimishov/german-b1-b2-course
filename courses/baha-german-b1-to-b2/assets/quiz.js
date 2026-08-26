@@ -15,7 +15,7 @@ const COURSE_LESSONS = [
   ["0012", "Wer gibt wem was – und warum?", "lessons/0012-wer-gibt-wem-was-und-warum.html"],
   ["0013", "Ihm, ihn oder es?", "lessons/0013-ihm-ihn-oder-es.html"],
   ["0014", "Er, ihm, ihn und sie, ihr, sie", "lessons/0014-er-ihm-ihn-und-sie-ihr-sie.html"],
-  ["0015", "Wer macht was mit wem?", "lessons/0015-wer-macht-was-mit-wem.html"]
+  ["0015", "Den Pronomen-Faden halten", "lessons/0015-wer-macht-was-mit-wem.html"]
 ].map(([id, title, href]) => ({ id, title, href }));
 
 function readCourseState() {
@@ -810,6 +810,41 @@ document.querySelectorAll("[data-pronoun-story-production]").forEach((checker) =
     feedback.textContent = passed === checks.length
       ? "8/8 — deine Pronomenketten bleiben klar, auch wenn zwei Pronomen zusammenstehen."
       : `${passed}/8 — frage bei jedem Verb: Wer handelt? Was? Wem? Bei zwei Pronomen steht ihn/sie/es vor ihm/ihr.`;
+    feedback.className = `feedback ${passed === checks.length ? "good" : "try"}`;
+  });
+});
+
+document.querySelectorAll("[data-reference-story-production]").forEach((checker) => {
+  const input = checker.querySelector("textarea");
+  const button = checker.querySelector("[data-check-production]");
+  const feedback = checker.querySelector(".feedback");
+  const checks = [...checker.querySelectorAll("[data-check]")];
+
+  button?.addEventListener("click", () => {
+    const text = input.value.trim();
+    const sentences = text.split(/[.!?]+/).map((part) => part.trim()).filter(Boolean);
+    const usefulWords = text.match(/\b(?:Kunde|Kunden|Kundin|Kollege|Kollegen|Kollegin|Team|Büro|Plan|Vertrag|Angebot|Datei|Nachricht|Problem|Link|Unterlagen|Formular|Ergebnis|schickt|sendet|zeigt|erklärt|prüft|liest|öffnet|antwortet|braucht|bekommt|hilft|dankt)\b/gi) || [];
+    const timeStarters = text.match(/\b(?:Zuerst|Danach|Dann|Später|Anschließend|Zum Schluss|Deshalb)\b/gi) || [];
+    const timeClausesWithSubject = text.match(/\b(?:Zuerst|Danach|Dann|Später|Anschließend|Zum Schluss|Deshalb)\s+(?:\w+\s+){0,2}(?:ich|er|sie|es|der|die|das|ein|eine)\b/gi) || [];
+    const results = {
+      six: sentences.length >= 6,
+      subject: timeStarters.length >= 2 && timeClausesWithSubject.length === timeStarters.length,
+      masculine: /\ber\b/i.test(text) && /\b(?:ihm|ihn)\b/i.test(text),
+      feminine: /\bsie\b/i.test(text) && /\bihr\b/i.test(text),
+      neutral: /\b(?:es|dem Team|das Team)\b/i.test(text),
+      double: /\b(?:ihn|sie|es)\s+(?:ihm|ihr)\b/i.test(text),
+      weil: /\bweil\b[^.!?]*(?:braucht|prüft|liest|öffnet|versteht|bekommt|kennt|hilft|dankt|muss|möchte|kann)\s*(?:[.!?]|$)/i.test(text),
+      vocabulary: new Set(usefulWords.map((word) => word.toLowerCase())).size >= 6
+    };
+    const passed = checks.reduce((count, item) => {
+      const ok = results[item.dataset.check];
+      item.classList.toggle("pass", ok);
+      return count + Number(ok);
+    }, 0);
+    checker.dataset.score = `${passed}/${checks.length}`;
+    feedback.textContent = passed === checks.length
+      ? "8/8 Bausteine erkannt — kopiere dein Update jetzt zur inhaltlichen Bezugsprüfung."
+      : `${passed}/8 Bausteine erkannt — prüfe die Satzschienen; die Bedeutung kontrolliert danach dein Lehrer.`;
     feedback.className = `feedback ${passed === checks.length ? "good" : "try"}`;
   });
 });

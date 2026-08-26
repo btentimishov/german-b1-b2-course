@@ -25,6 +25,7 @@ The audit is complete only when each pronoun has an antecedent and each finite v
 ## Sources of truth
 
 - Fixed quiz answers live once, in the lesson’s `data-answer` attributes. The validator checks that every answer is one of the visible options.
+- Add `data-semantic-audit` to a revised lesson’s fixed-answer section. Every answer in that file must then carry `data-prompt` and `data-explanation`; validation fails when either audit field is missing.
 - Free production has no single answer key. The learner’s demonstrated understanding, intended meaning, and human correction live in a numbered `learning-records/*.md` file.
 - Teaching preferences and recurring review rules live in `NOTES.md`.
 - Grammar sources and their intended use live in `RESOURCES.md`.
