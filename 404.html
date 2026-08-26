@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Course moved</title>
+  <link rel="stylesheet" href="site-assets/catalog.css">
+  <script>
+    const redirects = [
+      ["/akmaral-german-a1-to-b1/", "/courses/akmaral-german-a1-to-b1/"],
+      ["/english-a2-to-b2/", "/courses/asel-english-b1-to-b2/"],
+      ["/lessons/", "/courses/baha-german-b1-to-b2/lessons/"],
+      ["/reference/", "/courses/baha-german-b1-to-b2/reference/"]
+    ];
+    const match = redirects.find(([oldPath]) => window.location.pathname.includes(oldPath));
+    if (match) window.location.replace(window.location.href.replace(match[0], match[1]));
+  </script>
+</head>
+<body>
+<main>
+  <header>
+    <p class="eyebrow">Course catalog</p>
+    <h1>This page moved.</h1>
+    <p class="lede">The learning workspaces now have one consistent home.</p>
+    <p><a class="button" href="./index.html">Open the course catalog →</a></p>
+  </header>
+</main>
+</body>
+</html>

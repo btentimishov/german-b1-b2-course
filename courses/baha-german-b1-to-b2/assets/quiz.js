@@ -14,7 +14,8 @@ const COURSE_LESSONS = [
   ["0011", "Ich gebe, schicke, zeige", "lessons/0011-ich-gebe-schicke-zeige.html"],
   ["0012", "Wer gibt wem was – und warum?", "lessons/0012-wer-gibt-wem-was-und-warum.html"],
   ["0013", "Ihm, ihn oder es?", "lessons/0013-ihm-ihn-oder-es.html"],
-  ["0014", "Er, ihm, ihn und sie, ihr, sie", "lessons/0014-er-ihm-ihn-und-sie-ihr-sie.html"]
+  ["0014", "Er, ihm, ihn und sie, ihr, sie", "lessons/0014-er-ihm-ihn-und-sie-ihr-sie.html"],
+  ["0015", "Wer macht was mit wem?", "lessons/0015-wer-macht-was-mit-wem.html"]
 ].map(([id, title, href]) => ({ id, title, href }));
 
 function readCourseState() {
@@ -768,6 +769,47 @@ document.querySelectorAll("[data-pronoun-chain-production]").forEach((checker) =
     feedback.textContent = passed === checks.length
       ? "7/7 — deine Satzkette verbindet Personen, Sachen und Pronomen natürlich."
       : `${passed}/7 — Merkhilfe: Wer? → er/sie/es · Wem? → ihm/ihr · Wen/was? → ihn/sie/es. Nach einem Zeitwort steht das Verb auf Position 2; nach „weil“ am Ende.`;
+    feedback.className = `feedback ${passed === checks.length ? "good" : "try"}`;
+  });
+});
+
+document.querySelectorAll("[data-pronoun-story-production]").forEach((checker) => {
+  const input = checker.querySelector("textarea");
+  const button = checker.querySelector("[data-check-production]");
+  const feedback = checker.querySelector(".feedback");
+  const checks = [...checker.querySelectorAll("[data-check]")];
+
+  button?.addEventListener("click", () => {
+    const text = input.value.trim();
+    const sentences = text.split(/[.!?]+/).map((part) => part.trim()).filter(Boolean);
+    const doublePronouns = text.match(/\b(?:ihn|sie|es)\s+(?:ihm|ihr)\b/gi) || [];
+    const usefulWords = text.match(/\b(?:Kunde|Kunden|Kundin|Kollege|Kollegen|Kollegin|Team|Plan|Vertrag|Angebot|Datei|Nachricht|Problem|Link|Unterlagen|Formular|Ergebnis|schickt|sendet|zeigt|erklärt|prüft|liest|öffnet|antwortet|braucht|bekommt)\b/gi) || [];
+    const results = {
+      eight: sentences.length >= 8,
+      masculine: /\ber\b[^.!?]{0,50}\bihn\b/i.test(text) && /\bihm\b/i.test(text),
+      feminine: (/(?:^|[.!?]\s*|\bweil\s+)sie\b[^.!?]{0,60}\b(?:liest|prüft|öffnet|schickt|sendet|zeigt|erklärt|antwortet|braucht|bekommt)\b/i.test(text)
+          || /\b(?:Zuerst|Danach|Dann|Später|Anschließend|Zum Schluss|Deshalb)\s+(?:liest|prüft|öffnet|schickt|sendet|zeigt|erklärt|antwortet|braucht|bekommt)\s+sie\b/i.test(text))
+        && /\bihr\b/i.test(text)
+        && (/\b(?:liest|prüft|öffnet|schickt|sendet|zeigt|erklärt|braucht)\s+sie\b/i.test(text) || /\bsie\s+(?:ihm|ihr)\b/i.test(text)),
+      neutral: /\bdas Team\b/i.test(text)
+        && (/(?:^|[.!?]\s*|\bweil\s+)es\b[^.!?]{0,60}\b(?:liest|prüft|öffnet|schickt|sendet|zeigt|erklärt|antwortet|braucht|bekommt)\b/i.test(text)
+          || /\b(?:Zuerst|Danach|Dann|Später|Anschließend|Zum Schluss|Deshalb)\s+(?:liest|prüft|öffnet|schickt|sendet|zeigt|erklärt|antwortet|braucht|bekommt)\s+es\b/i.test(text))
+        && /\bihm\b/i.test(text)
+        && (/\b(?:liest|prüft|öffnet|schickt|sendet|zeigt|erklärt|braucht)\s+es\b/i.test(text) || /\bes\s+(?:es|ihm|ihr)\b/i.test(text)),
+      double: doublePronouns.length >= 2,
+      v2: (text.match(/\b(?:Zuerst|Danach|Dann|Später|Anschließend|Zum Schluss|Deshalb)\s+(?:ruft|schickt|sendet|gibt|zeigt|erklärt|liest|prüft|öffnet|antwortet|braucht|bekommt|ist)\s+(?:ich|er|sie|es|der|die|das)\b/gi) || []).length >= 3,
+      weil: /\bweil\b[^.!?]*(?:braucht|prüft|liest|öffnet|versteht|bekommt|kennt|muss|möchte|kann)\s*(?:[.!?]|$)/i.test(text),
+      vocabulary: new Set(usefulWords.map((word) => word.toLowerCase())).size >= 6
+    };
+    const passed = checks.reduce((count, item) => {
+      const ok = results[item.dataset.check];
+      item.classList.toggle("pass", ok);
+      return count + Number(ok);
+    }, 0);
+    checker.dataset.score = `${passed}/${checks.length}`;
+    feedback.textContent = passed === checks.length
+      ? "8/8 — deine Pronomenketten bleiben klar, auch wenn zwei Pronomen zusammenstehen."
+      : `${passed}/8 — frage bei jedem Verb: Wer handelt? Was? Wem? Bei zwei Pronomen steht ihn/sie/es vor ihm/ihr.`;
     feedback.className = `feedback ${passed === checks.length ? "good" : "try"}`;
   });
 });

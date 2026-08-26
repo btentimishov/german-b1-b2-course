@@ -1,104 +1,47 @@
 <!doctype html>
-<html lang="de">
+<html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Ein interaktiver B1–B2-Deutschkurs für Alltag und Arbeit in Deutschland.">
-  <title>Deutsch im echten Leben · B1–B2</title>
-  <link rel="stylesheet" href="assets/course.css">
-  <script src="assets/quiz.js" defer></script>
+  <meta name="description" content="Interactive language-learning workspaces for Baha, Akmaral, and Asel.">
+  <title>Language Learning Workspaces</title>
+  <link rel="stylesheet" href="site-assets/catalog.css">
 </head>
-<body class="home-page">
+<body>
 <main>
-  <p class="eyebrow">Interaktiver Deutschkurs · B1–B2</p>
-  <h1>Deutsch im echten Leben</h1>
-  <p class="lede">Kurze, praktische Lektionen für mehr Sicherheit im Alltag und bei der Arbeit—mit Artikeln, Wortschatz und direktem Feedback.</p>
-  <div class="meta"><span>🎯 Alltag + Arbeit</span><span>⏱ 10–20 Minuten</span><span>🧠 Lernen durch Anwenden</span></div>
-  <div class="sentence-legend" aria-label="Die Satzrollen im Kurs"><span class="role-slot subject">Wer?</span><span class="role-slot verb">Verb</span><span class="role-slot recipient">Wem?</span><span class="role-slot thing">Was?</span><span class="role-slot reason">Warum?</span></div>
+  <header>
+    <p class="eyebrow">Three learners · three independent paths</p>
+    <h1>Language learning workspaces</h1>
+    <p class="lede">Each course keeps its own mission, learning history, lessons, reference cards, and review rhythm.</p>
+  </header>
 
-  <section class="card" data-course-dashboard>
-    <p class="eyebrow">Dein Lernstand</p>
-    <h2 style="margin-top:0">Klein lernen, gezielt wiederholen</h2>
-    <div class="learning-dashboard">
-      <div class="learning-stat"><strong data-course-progress-text>0/14 Lektionen</strong><span>Kursfortschritt</span></div>
-      <div class="learning-stat"><strong data-course-streak>0 Tage</strong><span>Lernserie</span></div>
-      <div class="learning-stat"><strong data-daily-goal>1 kurze Einheit</strong><span>Heutiges Ziel</span></div>
-    </div>
-    <div class="progress-track" aria-label="Kursfortschritt"><div class="progress-fill" data-course-progress-fill></div></div>
-    <h3>Deine Wiederholung</h3>
-    <ul class="review-list" data-review-list><li>Noch nichts fällig — beginne mit einer kurzen Lektion.</li></ul>
-    <p class="microcopy">Der Fortschritt bleibt privat und wird nur in diesem Browser gespeichert.</p>
+  <section class="course-grid" aria-label="Courses">
+    <article class="course-card german">
+      <p class="eyebrow">Baha · German · B1–B2</p>
+      <h2>Deutsch im echten Leben</h2>
+      <p>Practical German for everyday life and work, with focused grammar, workplace vocabulary, and adaptive follow-up lessons.</p>
+      <dl><div><dt>Lessons</dt><dd>15</dd></div><div><dt>Focus</dt><dd>Alltag + Arbeit</dd></div></dl>
+      <a class="button" href="courses/baha-german-b1-to-b2/index.html">Open Baha’s course →</a>
+    </article>
+
+    <article class="course-card german">
+      <p class="eyebrow">Akmaral · German · A1–B1</p>
+      <h2>Akmarals Deutschreise</h2>
+      <p>German for independent study and work communication, with concise Russian support and active production.</p>
+      <dl><div><dt>Lessons</dt><dd>5</dd></div><div><dt>Focus</dt><dd>Studium + Arbeit</dd></div></dl>
+      <a class="button" href="courses/akmaral-german-a1-to-b1/index.html">Open Akmaral’s course →</a>
+    </article>
+
+    <article class="course-card english">
+      <p class="eyebrow">Asel · English · B1–B2</p>
+      <h2>The English Compass</h2>
+      <p>Warm, practical English for family and social life, built around stories, plans, conversations, and useful grammar.</p>
+      <dl><div><dt>Lessons</dt><dd>5</dd></div><div><dt>Focus</dt><dd>Everyday life</dd></div></dl>
+      <a class="button" href="courses/asel-english-b1-to-b2/index.html">Open Asel’s course →</a>
+    </article>
   </section>
 
-  <section class="card" data-next-card>
-    <p class="eyebrow" data-next-eyebrow>Hier weitermachen</p>
-    <h2 style="margin-top:0" data-next-title>Lektion 1 · Im Meeting beitragen</h2>
-    <p>Öffne die nächste kurze Einheit. Du verstehst ein Muster, rufst es aktiv ab und benutzt es danach in einem eigenen Satz.</p>
-    <p><a href="lessons/0001-make-a-clear-meeting-contribution.html" data-next-link><strong>Lektion starten →</strong></a></p>
-  </section>
-
-  <section>
-    <h2>Deine Lernschleife</h2>
-    <div class="learning-loop">
-      <div><strong>1 · Verstehen</strong><span>Ein Muster in echtem Kontext sehen.</span></div>
-      <div><strong>2 · Abrufen</strong><span>Die Antwort zuerst selbst erinnern.</span></div>
-      <div><strong>3 · Anwenden</strong><span>Einen eigenen Satz für Alltag oder Arbeit bilden.</span></div>
-      <div><strong>4 · Wiederholen</strong><span>Nach 1, 3, 7 und 14 Tagen kurz zurückkommen.</span></div>
-    </div>
-  </section>
-
-  <section>
-    <h2>Deine Lektionen</h2>
-    <div class="example-grid">
-      <div class="example-card" data-lesson-card="0001"><p class="eyebrow">Lektion 1</p><h3>Im Meeting beitragen</h3><p>Eine klare Meinung, Begründung oder einen Vorschlag formulieren.</p><a href="lessons/0001-make-a-clear-meeting-contribution.html">Öffnen →</a></div>
-      <div class="example-card" data-lesson-card="0002"><p class="eyebrow">Lektion 2</p><h3>Smalltalk weiterführen</h3><p>Antwort, persönliches Detail und Rückfrage verbinden.</p><a href="lessons/0002-keep-smalltalk-going.html">Öffnen →</a></div>
-      <div class="example-card" data-lesson-card="0003"><p class="eyebrow">Lektion 3</p><h3>Konkrete Rückfragen</h3><p>Ein interessantes Detail hören und gezielt nachfragen.</p><a href="lessons/0003-ask-specific-follow-up-questions.html">Öffnen →</a></div>
-      <div class="example-card" data-lesson-card="0004"><p class="eyebrow">Lektion 4</p><h3>Artikel im echten Leben</h3><p><code>für + Akkusativ</code> und <code>mit + Dativ</code> beim Teamfrühstück.</p><a href="lessons/0004-artikel-im-echten-leben.html">Öffnen →</a></div>
-      <div class="example-card" data-lesson-card="0005"><p class="eyebrow">Lektion 5</p><h3>Genus-Detektiv</h3><p>Zuverlässige Signale für <code>der</code>, <code>die</code> und <code>das</code> erkennen.</p><a href="lessons/0005-der-die-das-detektiv.html">Öffnen →</a></div>
-      <div class="example-card" data-lesson-card="0006"><p class="eyebrow">Lektion 6</p><h3>Ein oder das?</h3><p>Neue Dinge einführen und danach bestimmt darauf verweisen.</p><a href="lessons/0006-ein-oder-das.html">Öffnen →</a></div>
-      <div class="example-card" data-lesson-card="0007"><p class="eyebrow">Lektion 7</p><h3>Wem schickst du was?</h3><p>Dativ-Empfänger und Akkusativ-Sache sicher verbinden.</p><a href="lessons/0007-wem-schickst-du-was.html">Öffnen →</a></div>
-      <div class="example-card" data-lesson-card="0008"><p class="eyebrow">Lektion 8</p><h3>Ein oder einen?</h3><p>Maskuline und neutrale Akkusativformen unterscheiden.</p><a href="lessons/0008-ein-oder-einen.html">Öffnen →</a></div>
-      <div class="example-card" data-lesson-card="0009"><p class="eyebrow">Lektion 9</p><h3>Der Nomen-Pass</h3><p>Grundartikel erinnern, Satzrolle erkennen, Form bilden.</p><a href="lessons/0009-der-nomen-pass.html">Öffnen →</a></div>
-      <div class="example-card" data-lesson-card="0010"><p class="eyebrow">Lektion 10</p><h3>Wem–was im Rhythmus</h3><p>Kasusformen ohne Auswahl abrufen und drei Büro-Übergaben formulieren.</p><a href="lessons/0010-wem-was-im-rhythmus.html">Öffnen →</a></div>
-      <div class="example-card" data-lesson-card="0011"><p class="eyebrow">Lektion 11</p><h3>Ich gebe, schicke, zeige</h3><p>Verbform, Dativ-Empfänger und Akkusativ-Sache als vollständigen Satz verbinden.</p><a href="lessons/0011-ich-gebe-schicke-zeige.html">Öffnen →</a></div>
-      <div class="example-card" data-lesson-card="0012"><p class="eyebrow">Lektion 12 · 20 Minuten</p><h3>Wer gibt wem was – und warum?</h3><p>Drei Fälle, Satzstellung nach „danach“ und Verb-am-Ende mit „weil“ verbinden.</p><a href="lessons/0012-wer-gibt-wem-was-und-warum.html">Öffnen →</a></div>
-      <div class="example-card" data-lesson-card="0013"><p class="eyebrow">Lektion 13 · 22 Minuten</p><h3>Ihm, ihn oder es?</h3><p>Artikel und Personalpronomen in Nominativ, Dativ und Akkusativ sicher verwenden.</p><a href="lessons/0013-ihm-ihn-oder-es.html">Öffnen →</a></div>
-      <div class="example-card" data-lesson-card="0014"><p class="eyebrow">Lektion 14 · 24 Minuten</p><h3>Er, ihm, ihn und sie, ihr, sie</h3><p>Pronomen als Dreiergruppen abrufen und in verbundenen Sätzen natürlich verwenden.</p><a href="lessons/0014-er-ihm-ihn-und-sie-ihr-sie.html">Öffnen →</a></div>
-    </div>
-  </section>
-
-  <section class="card">
-    <p class="eyebrow">So funktioniert der Kurs</p>
-    <ol class="task-list">
-      <li><span>Öffne die nächste Lektion und löse die interaktiven Übungen.</span></li>
-      <li><span>Prüfe deine Antworten direkt im Browser.</span></li>
-      <li><span>Kopiere am Ende deinen Lernbericht und sende ihn an deinen KI-Lehrer.</span></li>
-      <li><span>Die nächste Lektion wird passend zu deinen echten Fehlern erstellt.</span></li>
-    </ol>
-  </section>
-
-  <section>
-    <h2>Kurzreferenzen</h2>
-    <p>Zum schnellen Wiederholen und Ausdrucken:</p>
-    <ul>
-      <li><a href="reference/0004-artikel-mit-fuer.html">Artikel mit „mit“ und „für“</a></li>
-      <li><a href="reference/0005-genus-signale.html">Zuverlässige Genus-Signale</a></li>
-      <li><a href="reference/0006-ein-oder-bestimmt.html">Neu oder schon bekannt?</a></li>
-      <li><a href="reference/0007-wem-was-fallkarte.html">Wem–Was-Fallkarte</a></li>
-      <li><a href="reference/0008-ein-einen-einem-einer.html">Ein, einen, einem oder einer?</a></li>
-      <li><a href="reference/0009-nomen-pass.html">Der Nomen-Pass</a></li>
-      <li><a href="reference/0010-wem-was-rhythmus.html">Wem–was-Rhythmus</a></li>
-      <li><a href="reference/0011-ich-verb-wem-was.html">Ich + Verb + Wem? + Was?</a></li>
-      <li><a href="reference/0012-wer-wem-was-warum.html">Wer–wem–was–warum?</a></li>
-      <li><a href="reference/0013-personalpronomen-faelle.html">Personalpronomen in drei Fällen</a></li>
-      <li><a href="reference/0014-pronomen-dreiergruppen.html">Pronomen-Dreiergruppen mit russischen Merkhilfen</a></li>
-    </ul>
-  </section>
-
-  <footer class="source">
-    <p class="eyebrow">Kursziel</p>
-    <p>Deutsch sicher und natürlich im Alltag und bei der Arbeit in Deutschland verwenden.</p>
-  </footer>
+  <footer><p>Private learning records stay inside each learner’s workspace and are not published.</p></footer>
 </main>
 </body>
 </html>
