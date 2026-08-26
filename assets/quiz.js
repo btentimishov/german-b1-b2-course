@@ -13,7 +13,8 @@ const COURSE_LESSONS = [
   ["0010", "Wem–was im Rhythmus", "lessons/0010-wem-was-im-rhythmus.html"],
   ["0011", "Ich gebe, schicke, zeige", "lessons/0011-ich-gebe-schicke-zeige.html"],
   ["0012", "Wer gibt wem was – und warum?", "lessons/0012-wer-gibt-wem-was-und-warum.html"],
-  ["0013", "Ihm, ihn oder es?", "lessons/0013-ihm-ihn-oder-es.html"]
+  ["0013", "Ihm, ihn oder es?", "lessons/0013-ihm-ihn-oder-es.html"],
+  ["0014", "Er, ihm, ihn und sie, ihr, sie", "lessons/0014-er-ihm-ihn-und-sie-ihr-sie.html"]
 ].map(([id, title, href]) => ({ id, title, href }));
 
 function readCourseState() {
@@ -732,6 +733,41 @@ document.querySelectorAll("[data-pronoun-production]").forEach((checker) => {
     feedback.textContent = passed === checks.length
       ? "6/6 — du verbindest Fälle, Pronomen und Satzstellung sicher."
       : `${passed}/6 — prüfe: Wem? → ihm/ihr; Was? → ihn/sie/es; im weil-Satz steht das Verb am Ende.`;
+    feedback.className = `feedback ${passed === checks.length ? "good" : "try"}`;
+  });
+});
+
+document.querySelectorAll("[data-pronoun-chain-production]").forEach((checker) => {
+  const input = checker.querySelector("textarea");
+  const button = checker.querySelector("[data-check-production]");
+  const feedback = checker.querySelector(".feedback");
+  const checks = [...checker.querySelectorAll("[data-check]")];
+
+  button?.addEventListener("click", () => {
+    const text = input.value.trim();
+    const sentences = text.split(/[.!?]+/).map((part) => part.trim()).filter(Boolean);
+    const dativePronouns = text.match(/\b(?:ihm|ihr)\b/gi) || [];
+    const accusativePronouns = text.match(/\b(?:ihn|sie|es)\b/gi) || [];
+    const usefulVerbs = text.match(/\b(?:anrufen|rufe|schicken|schicke|senden|sende|geben|gebe|zeigen|zeige|erklären|erkläre|lesen|liest|prüfen|prüft|antworten|antworte|verstehen|versteht|brauchen|braucht|öffnen|öffnet|bekommen|bekommt)\b/gi) || [];
+    const results = {
+      six: sentences.length >= 6,
+      dative: dativePronouns.length >= 3,
+      accusative: accusativePronouns.length >= 2,
+      subject: /(?:^|[.!?]\s*|\bweil\s+)(?:er|sie|es)\s+(?:\w+\s+){0,3}(?:liest|prüft|antwortet|versteht|braucht|öffnet|bekommt)\b/i.test(text)
+        || /\b(?:Zuerst|Danach|Dann|Später|Anschließend|Zum Schluss)\s+(?:\w+\s+){0,2}(?:er|sie|es)\b/i.test(text),
+      v2: (text.match(/\b(?:Zuerst|Danach|Dann|Später|Anschließend|Zum Schluss)\s+(?:rufe|schicke|sende|gebe|zeige|erkläre|lese|liest|prüfe|prüft|antworte|antwortet|ist)\s+(?:ich|er|sie|es)\b/gi) || []).length >= 2,
+      weil: /\bweil\s+(?:er|sie|es)\s+(?:ihn|sie|es)\s+(?:\w+\s+){0,3}(?:versteht|braucht|prüft|öffnet|bekommt)\b/i.test(text),
+      verbs: new Set(usefulVerbs.map((verb) => verb.toLowerCase())).size >= 3
+    };
+    const passed = checks.reduce((count, item) => {
+      const ok = results[item.dataset.check];
+      item.classList.toggle("pass", ok);
+      return count + Number(ok);
+    }, 0);
+    checker.dataset.score = `${passed}/${checks.length}`;
+    feedback.textContent = passed === checks.length
+      ? "7/7 — deine Satzkette verbindet Personen, Sachen und Pronomen natürlich."
+      : `${passed}/7 — Merkhilfe: Wer? → er/sie/es · Wem? → ihm/ihr · Wen/was? → ihn/sie/es. Nach einem Zeitwort steht das Verb auf Position 2; nach „weil“ am Ende.`;
     feedback.className = `feedback ${passed === checks.length ? "good" : "try"}`;
   });
 });

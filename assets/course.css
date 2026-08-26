@@ -317,6 +317,10 @@ select, input[type="text"], input[type="range"] {
 .grammar-callout { border: 1px solid var(--line); border-left: 6px solid var(--yellow); border-radius: 9px; padding: 18px; background: var(--yellow-soft); }
 .ru-hint { border: 1px solid #d7c9ed; border-left: 6px solid #7954b3; border-radius: 9px; padding: 16px 18px; background: #f5f0fc; }
 .ru-hint strong { color: #5f3f93; }
+.triplet-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin: 24px 0; }
+.triplet-card { border: 1px solid var(--line); border-radius: 14px; padding: 18px; background: linear-gradient(180deg, #fff 0%, #f7faff 100%); box-shadow: 0 5px 0 rgb(23 35 59 / 5%); }
+.triplet-card strong { display: block; color: var(--accent); font-size: .92rem; text-transform: uppercase; letter-spacing: .04em; }
+.triplet-card p { margin: 8px 0 0; }
 .home-page h1 { max-width: 10ch; }
 .home-page .sentence-legend { margin-top: 28px; }
 nav { margin-top: 70px; padding-top: 22px; border-top: 1px solid var(--line); }
@@ -335,6 +339,7 @@ th { color: var(--accent); font-size: 0.82rem; text-transform: uppercase; }
   .learning-dashboard { grid-template-columns: 1fr; }
   .learning-loop { grid-template-columns: 1fr 1fr; }
   .lesson-route { grid-template-columns: 1fr 1fr; }
+  .triplet-grid { grid-template-columns: 1fr; }
   .course-topbar { align-items: flex-start; }
   table { display: block; max-width: 100%; overflow-x: auto; }
 }
