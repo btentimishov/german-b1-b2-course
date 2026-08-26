@@ -12,7 +12,8 @@ const COURSE_LESSONS = [
   ["0009", "Der Nomen-Pass", "lessons/0009-der-nomen-pass.html"],
   ["0010", "Wem–was im Rhythmus", "lessons/0010-wem-was-im-rhythmus.html"],
   ["0011", "Ich gebe, schicke, zeige", "lessons/0011-ich-gebe-schicke-zeige.html"],
-  ["0012", "Wer gibt wem was – und warum?", "lessons/0012-wer-gibt-wem-was-und-warum.html"]
+  ["0012", "Wer gibt wem was – und warum?", "lessons/0012-wer-gibt-wem-was-und-warum.html"],
+  ["0013", "Ihm, ihn oder es?", "lessons/0013-ihm-ihn-oder-es.html"]
 ].map(([id, title, href]) => ({ id, title, href }));
 
 function readCourseState() {
@@ -377,7 +378,7 @@ document.querySelectorAll("[data-word-card]").forEach((card) => {
   card.addEventListener("click", () => card.classList.toggle("revealed"));
 });
 
-document.querySelectorAll("[data-article-lab], [data-genus-lab], [data-context-lab], [data-case-lab], [data-ending-lab], [data-automaticity-lab], [data-action-lab], [data-why-lab]").forEach((lab) => {
+document.querySelectorAll("[data-article-lab], [data-genus-lab], [data-context-lab], [data-case-lab], [data-ending-lab], [data-automaticity-lab], [data-action-lab], [data-why-lab], [data-pronoun-lab]").forEach((lab) => {
   const selects = [...lab.querySelectorAll("[data-answer]")];
   const button = lab.querySelector("[data-check-articles]");
   const feedback = lab.querySelector(".feedback");
@@ -679,10 +680,13 @@ document.querySelectorAll("[data-why-production]").forEach((checker) => {
   button?.addEventListener("click", () => {
     const text = input.value.trim();
     const sentences = text.split(/[.!?]+/).map((part) => part.trim()).filter(Boolean);
+    const recipient = "(?:einem Kollegen|einem Kunden|einem Freund|einem Team|einer Kollegin|einer Kundin|einer Freundin)";
+    const thing = "(?:einen Vertrag|einen Ordner|einen Link|einen Termin|eine Datei|eine Nachricht|ein Dokument|ein Angebot|ein Foto|ein Paket)";
+    const completePair = new RegExp(`\\b(?:(?:Zuerst|Danach|Anschließend)\\s+(?:gebe|schicke|zeige|sende)\\s+ich|Ich\\s+(?:gebe|schicke|zeige|sende))\\s+${recipient}\\s+${thing}\\b`, "gi");
     const results = {
       four: sentences.length >= 4,
       v2: ((text.match(/\b(?:Zuerst|Danach|Anschließend)\s+(?:gebe|schicke|zeige|sende)\s+ich\b/gi) || []).length >= 2),
-      cases: /\b(?:einem|einer)\s+(?:Kollegen|Kunden|Kollegin|Kundin|Freund|Freundin)\b/i.test(text) && /\b(?:einen|eine|ein)\s+(?:Vertrag|Ordner|Link|Termin|Datei|Nachricht|Dokument|Angebot|Foto|Paket)\b/i.test(text),
+      cases: (text.match(completePair) || []).length >= 4,
       weil: /\bweil\s+(?:der Kunde|der Kollege|die Kundin|die Kollegin|das Team)\s+(?:den Vertrag|den Ordner|den Link|die Datei|die Nachricht|das Dokument|das Angebot)\s+(?:braucht|prüft|bekommt)\b/i.test(text),
       vocabulary: new Set((text.match(/Kolleg\w*|Kund\w*|Vertrag|Ordner|Link|Termin|Datei|Nachricht|Dokument|Angebot|Foto|Paket/gi) || []).map((word) => word.toLowerCase())).size >= 5
     };
@@ -695,6 +699,39 @@ document.querySelectorAll("[data-why-production]").forEach((checker) => {
     feedback.textContent = passed === checks.length
       ? "5/5 — dein Update verbindet Satzstellung, Fälle und Begründung sicher."
       : `${passed}/5 — prüfe die Satzschiene: Zeitwort + Verb + ich; nach „weil“ steht das Verb am Ende.`;
+    feedback.className = `feedback ${passed === checks.length ? "good" : "try"}`;
+  });
+});
+
+document.querySelectorAll("[data-pronoun-production]").forEach((checker) => {
+  const input = checker.querySelector("textarea");
+  const button = checker.querySelector("[data-check-production]");
+  const feedback = checker.querySelector(".feedback");
+  const checks = [...checker.querySelectorAll("[data-check]")];
+
+  button?.addEventListener("click", () => {
+    const text = input.value.trim();
+    const sentences = text.split(/[.!?]+/).map((part) => part.trim()).filter(Boolean);
+    const recipient = "(?:einem Kollegen|einem Kunden|einem Freund|einem Team|einer Kollegin|einer Kundin|einer Freundin)";
+    const thing = "(?:einen Vertrag|einen Ordner|einen Link|eine Datei|eine Nachricht|ein Angebot|ein Dokument|ein Foto|ein Paket)";
+    const fullPair = new RegExp(`\\b(?:(?:Zuerst|Danach|Anschließend)\\s+(?:gebe|schicke|zeige|sende)\\s+ich|Ich\\s+(?:gebe|schicke|zeige|sende))\\s+${recipient}\\s+${thing}\\b`, "gi");
+    const results = {
+      five: sentences.length >= 5,
+      pairs: (text.match(fullPair) || []).length >= 3,
+      dativePronoun: /\b(?:(?:Zuerst|Danach|Anschließend)\s+(?:gebe|schicke|zeige|sende)\s+ich|Ich\s+(?:gebe|schicke|zeige|sende))\s+(?:ihm|ihr)\b/i.test(text),
+      accusativePronoun: /\b(?:braucht|prüft|bekommt|sieht|öffnet)\s+(?:ihn|sie|es)\b/i.test(text) || /\b(?:ihn|sie|es)\s+(?:heute\s+)?(?:braucht|prüft|bekommt|sieht|öffnet)\b/i.test(text),
+      weil: /\bweil\s+(?:er|sie|es)\s+(?:ihn|sie|es)\s+(?:heute\s+)?(?:braucht|prüft|bekommt|sieht|öffnet)\b/i.test(text),
+      v2: (text.match(/\b(?:Zuerst|Danach|Anschließend)\s+(?:gebe|schicke|zeige|sende)\s+ich\b/gi) || []).length >= 2
+    };
+    const passed = checks.reduce((count, item) => {
+      const ok = results[item.dataset.check];
+      item.classList.toggle("pass", ok);
+      return count + Number(ok);
+    }, 0);
+    checker.dataset.score = `${passed}/${checks.length}`;
+    feedback.textContent = passed === checks.length
+      ? "6/6 — du verbindest Fälle, Pronomen und Satzstellung sicher."
+      : `${passed}/6 — prüfe: Wem? → ihm/ihr; Was? → ihn/sie/es; im weil-Satz steht das Verb am Ende.`;
     feedback.className = `feedback ${passed === checks.length ? "good" : "try"}`;
   });
 });

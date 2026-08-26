@@ -315,6 +315,8 @@ select, input[type="text"], input[type="range"] {
 .route-stop strong { display: block; color: var(--accent); font-family: ui-monospace, "SFMono-Regular", Consolas, monospace; font-size: .76rem; }
 .route-stop span { display: block; margin-top: 4px; font-size: .86rem; line-height: 1.35; }
 .grammar-callout { border: 1px solid var(--line); border-left: 6px solid var(--yellow); border-radius: 9px; padding: 18px; background: var(--yellow-soft); }
+.ru-hint { border: 1px solid #d7c9ed; border-left: 6px solid #7954b3; border-radius: 9px; padding: 16px 18px; background: #f5f0fc; }
+.ru-hint strong { color: #5f3f93; }
 .home-page h1 { max-width: 10ch; }
 .home-page .sentence-legend { margin-top: 28px; }
 nav { margin-top: 70px; padding-top: 22px; border-top: 1px solid var(--line); }
