@@ -11,7 +11,8 @@ const COURSE_LESSONS = [
   ["0008", "Ein oder einen?", "lessons/0008-ein-oder-einen.html"],
   ["0009", "Der Nomen-Pass", "lessons/0009-der-nomen-pass.html"],
   ["0010", "Wem–was im Rhythmus", "lessons/0010-wem-was-im-rhythmus.html"],
-  ["0011", "Ich gebe, schicke, zeige", "lessons/0011-ich-gebe-schicke-zeige.html"]
+  ["0011", "Ich gebe, schicke, zeige", "lessons/0011-ich-gebe-schicke-zeige.html"],
+  ["0012", "Wer gibt wem was – und warum?", "lessons/0012-wer-gibt-wem-was-und-warum.html"]
 ].map(([id, title, href]) => ({ id, title, href }));
 
 function readCourseState() {
@@ -216,7 +217,33 @@ function addLessonCompletion() {
   refresh();
 }
 
+function addCourseChrome() {
+  const lessonId = currentLessonId();
+  const main = document.querySelector("main");
+  if (!lessonId || !main) return;
+  const lessonIndex = COURSE_LESSONS.findIndex(({ id }) => id === lessonId);
+  const topbar = document.createElement("div");
+  topbar.className = "course-topbar";
+  topbar.innerHTML = `<a href="../index.html">← Kursübersicht</a><span>Lektion ${lessonIndex + 1} von ${COURSE_LESSONS.length}</span>`;
+  main.prepend(topbar);
+  const rail = document.createElement("div");
+  rail.className = "course-progress-rail";
+  rail.setAttribute("aria-hidden", "true");
+  rail.innerHTML = "<span></span>";
+  document.body.prepend(rail);
+  const fill = rail.querySelector("span");
+  const update = () => {
+    const available = document.documentElement.scrollHeight - window.innerHeight;
+    const percent = available > 0 ? Math.min(100, Math.max(0, (window.scrollY / available) * 100)) : 100;
+    fill.style.width = `${percent}%`;
+  };
+  update();
+  window.addEventListener("scroll", update, { passive: true });
+  window.addEventListener("resize", update);
+}
+
 renderCourseDashboard();
+addCourseChrome();
 addLessonCompletion();
 
 document.querySelectorAll("[data-quiz]").forEach((quiz) => {
@@ -350,7 +377,7 @@ document.querySelectorAll("[data-word-card]").forEach((card) => {
   card.addEventListener("click", () => card.classList.toggle("revealed"));
 });
 
-document.querySelectorAll("[data-article-lab], [data-genus-lab], [data-context-lab], [data-case-lab], [data-ending-lab], [data-automaticity-lab], [data-action-lab]").forEach((lab) => {
+document.querySelectorAll("[data-article-lab], [data-genus-lab], [data-context-lab], [data-case-lab], [data-ending-lab], [data-automaticity-lab], [data-action-lab], [data-why-lab]").forEach((lab) => {
   const selects = [...lab.querySelectorAll("[data-answer]")];
   const button = lab.querySelector("[data-check-articles]");
   const feedback = lab.querySelector(".feedback");
@@ -639,6 +666,35 @@ document.querySelectorAll("[data-action-production]").forEach((checker) => {
     feedback.textContent = passed === checks.length
       ? "4/4 — Verb, Empfänger und Sache stimmen in allen drei Sätzen."
       : `${passed}/4 — prüfe jeden Satz in dieser Reihenfolge: Ich + Verb-e, Wem?, Was?`;
+    feedback.className = `feedback ${passed === checks.length ? "good" : "try"}`;
+  });
+});
+
+document.querySelectorAll("[data-why-production]").forEach((checker) => {
+  const input = checker.querySelector("textarea");
+  const button = checker.querySelector("[data-check-production]");
+  const feedback = checker.querySelector(".feedback");
+  const checks = [...checker.querySelectorAll("[data-check]")];
+
+  button?.addEventListener("click", () => {
+    const text = input.value.trim();
+    const sentences = text.split(/[.!?]+/).map((part) => part.trim()).filter(Boolean);
+    const results = {
+      four: sentences.length >= 4,
+      v2: ((text.match(/\b(?:Zuerst|Danach|Anschließend)\s+(?:gebe|schicke|zeige|sende)\s+ich\b/gi) || []).length >= 2),
+      cases: /\b(?:einem|einer)\s+(?:Kollegen|Kunden|Kollegin|Kundin|Freund|Freundin)\b/i.test(text) && /\b(?:einen|eine|ein)\s+(?:Vertrag|Ordner|Link|Termin|Datei|Nachricht|Dokument|Angebot|Foto|Paket)\b/i.test(text),
+      weil: /\bweil\s+(?:der Kunde|der Kollege|die Kundin|die Kollegin|das Team)\s+(?:den Vertrag|den Ordner|den Link|die Datei|die Nachricht|das Dokument|das Angebot)\s+(?:braucht|prüft|bekommt)\b/i.test(text),
+      vocabulary: new Set((text.match(/Kolleg\w*|Kund\w*|Vertrag|Ordner|Link|Termin|Datei|Nachricht|Dokument|Angebot|Foto|Paket/gi) || []).map((word) => word.toLowerCase())).size >= 5
+    };
+    const passed = checks.reduce((count, item) => {
+      const ok = results[item.dataset.check];
+      item.classList.toggle("pass", ok);
+      return count + Number(ok);
+    }, 0);
+    checker.dataset.score = `${passed}/${checks.length}`;
+    feedback.textContent = passed === checks.length
+      ? "5/5 — dein Update verbindet Satzstellung, Fälle und Begründung sicher."
+      : `${passed}/5 — prüfe die Satzschiene: Zeitwort + Verb + ich; nach „weil“ steht das Verb am Ende.`;
     feedback.className = `feedback ${passed === checks.length ? "good" : "try"}`;
   });
 });
