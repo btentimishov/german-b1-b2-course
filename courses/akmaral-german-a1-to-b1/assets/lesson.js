@@ -171,6 +171,44 @@
       reviewCopy: "Короткая проверка завершена. Первые ответы сохранены, а нужные исправления показаны рядом.",
       followUp: "Was hast du gestern gemacht, und wie bist du nach Hause gekommen?",
       teacherPrompt: "Please review only the new original message. Advance to weil word order if ordinary actions keep haben, movement keeps sein, and the participle remains at the end; otherwise recycle Perfekt briefly inside a new real-life topic rather than adding another full Perfekt lesson."
+    },
+    "lesson-0007": {
+      number: "7",
+      title: "Nach dem Kurs: zuerst, dann, danach",
+      focus: "a connected study-day story with sequence words and brief mixed Perfekt retrieval",
+      messageMinimum: 5,
+      messageChecks(value) {
+        const text = normalize(value);
+        const participles = text.match(/\b(gelernt|gearbeitet|gemacht|getrunken|gegessen|besucht|geschrieben|gelesen|gegangen|gefahren|gekommen|angekommen)\b/gi) || [];
+        const sequenceWords = text.match(/\b(zuerst|dann|danach|später|am ende)\b/gi) || [];
+        return {
+          length: words(value) >= 45 && words(value) <= 70,
+          time: /\b(gestern|vorgestern|am\s+(montag|dienstag|mittwoch|donnerstag|freitag|samstag|sonntag)|am\s+morgen|am\s+abend|nach\s+dem\s+kurs|nach\s+der\s+arbeit)\b/i.test(text),
+          sequence: new Set(sequenceWords.map((item) => item.toLocaleLowerCase("de-DE"))).size >= 3,
+          haben: /\b(habe|hast|hat|haben|habt)\b[^.!?]{0,100}\b(gelernt|gearbeitet|gemacht|getrunken|gegessen|besucht|geschrieben|gelesen)\b/i.test(text),
+          sein: /\b(bin|bist|ist|sind|seid)\b[^.!?]{0,100}\b(gegangen|gefahren|gekommen|angekommen)\b/i.test(text),
+          actions: new Set(participles.map((item) => item.toLocaleLowerCase("de-DE"))).size >= 4,
+          question: /\?/.test(value)
+        };
+      },
+      messageLabels: {
+        length: "45–70 слов",
+        time: "когда это было",
+        sequence: "три слова порядка",
+        haben: "действие с haben",
+        sein: "перемещение с sein",
+        actions: "четыре действия в Perfekt",
+        question: "вопрос собеседнику"
+      },
+      exitSuccess: "порядок событий и ключевые формы Perfekt стали яснее",
+      exitReview: "первые ответы учтены; повтори отмеченную строку завтра",
+      ready(checks, score) {
+        return score >= 3 && checks.length && checks.sequence && checks.haben && checks.sein && checks.actions;
+      },
+      readyCopy: "Ты связала четыре прошлых действия в один понятный рассказ. Первые ответы сохранены как учебное свидетельство.",
+      reviewCopy: "Рассказ завершён. Первые ответы сохранены, а нужные исправления показаны рядом.",
+      followUp: "Was hast du gestern nach dem Kurs oder nach der Arbeit gemacht?",
+      teacherPrompt: "Please review whether Akmaral can independently connect a past story with zuerst/dann/danach/am Ende while keeping haben with ordinary actions, sein with movement, and Partizip II at the end. Move to weil only if auxiliary choice is stable in the original message."
     }
   };
 
