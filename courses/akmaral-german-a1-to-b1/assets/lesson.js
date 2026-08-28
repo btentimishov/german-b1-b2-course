@@ -209,6 +209,48 @@
       reviewCopy: "Рассказ завершён. Первые ответы сохранены, а нужные исправления показаны рядом.",
       followUp: "Was hast du gestern nach dem Kurs oder nach der Arbeit gemacht?",
       teacherPrompt: "Please review whether Akmaral can independently connect a past story with zuerst/dann/danach/am Ende while keeping haben with ordinary actions, sein with movement, and Partizip II at the end. Move to weil only if auxiliary choice is stable in the original message."
+    },
+    "lesson-0008": {
+      number: "8",
+      title: "Im Modegeschäft: anprobieren, passen, kosten",
+      focus: "five clothing-store verbs with Russian translations, Präsens, Perfekt, and practical questions",
+      messageMinimum: 5,
+      messageChecks(value) {
+        const text = normalize(value);
+        const vocabularyPatterns = [
+          /\banprobier(?:e|st|t|en)|\banprobiert\b/i,
+          /\bpass(?:e|t|en)|\bgepasst\b/i,
+          /\bkost(?:e|est|et|en)|\bgekostet\b/i,
+          /\bumtausch(?:e|st|t|en)|\bumgetauscht\b/i,
+          /\bbehalt(?:e|en|et)|\bbehältst|\bbehält|\bbehalten\b/i
+        ];
+        const vocabularyCount = vocabularyPatterns.filter((pattern) => pattern.test(text)).length;
+        return {
+          length: words(value) >= 45 && words(value) <= 70,
+          item: /\b(bluse|t-shirt|shirt|pullover|jacke|hose|kleid|schuhe?)\b/i.test(text),
+          vocabulary: vocabularyCount >= 3,
+          present: /\b(probiere|probierst|probiert|passt|kosten|kostet|tausche|tauschst|tauscht|behalte|behältst|behält)\b/i.test(text),
+          perfect: /\b(habe|hast|hat|haben|habt)\b[^.!?]{0,100}\b(anprobiert|gepasst|gekostet|umgetauscht|behalten)\b/i.test(text),
+          question: /\b(welche|welcher|welches|wie viel|passt|soll ich|gefällt)\b[^?]*\?/i.test(text)
+        };
+      },
+      messageLabels: {
+        length: "45–70 слов",
+        item: "предмет одежды",
+        vocabulary: "три новых слова",
+        present: "одно предложение в Präsens",
+        perfect: "одно действие в Perfekt",
+        question: "вопрос по теме магазина"
+      },
+      exitSuccess: "новые слова использованы в формах настоящего и прошедшего времени",
+      exitReview: "первые ответы учтены; повтори только отмеченные формы",
+      ready(checks, score) {
+        return score >= 3 && checks.length && checks.item && checks.vocabulary && checks.perfect && checks.question;
+      },
+      readyCopy: "Ты использовала минимум три новых слова в собственном сообщении и задала вопрос по теме магазина. Первые ответы сохранены как учебное свидетельство.",
+      reviewCopy: "Урок завершён. Первые ответы сохранены, а нужные формы показаны рядом.",
+      followUp: "Welche Farbe gefällt dir besser: Blau, Grün oder Rot?",
+      teacherPrompt: "Please review whether Akmaral independently used at least three of the target verbs (anprobieren, passen, kosten, umtauschen, behalten), kept haben in Perfekt, and formed a clothing-store question. Vary the next speaking question; do not ask what she did yesterday."
     }
   };
 
