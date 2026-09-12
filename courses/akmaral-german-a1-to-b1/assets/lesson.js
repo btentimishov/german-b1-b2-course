@@ -251,6 +251,51 @@
       reviewCopy: "Урок завершён. Первые ответы сохранены, а нужные формы показаны рядом.",
       followUp: "Welche Farbe gefällt dir besser: Blau, Grün oder Rot?",
       teacherPrompt: "Please review whether Akmaral independently used at least three of the target verbs (anprobieren, passen, kosten, umtauschen, behalten), kept haben in Perfekt, and formed a clothing-store question. Vary the next speaking question; do not ask what she did yesterday."
+    },
+    "lesson-0009": {
+      number: "9",
+      title: "Warum diese Jacke? Hauptsatz oder weil-Satz",
+      focus: "shopping decisions with verb-second after a time phrase and verb-final order after weil",
+      messageMinimum: 6,
+      messageChecks(value) {
+        const text = normalize(value);
+        const vocabularyPatterns = [
+          /\bauswähl(?:e|st|t|en)|\bausgewählt\b/i,
+          /\bvergleich(?:e|st|t|en)|\bverglichen\b/i,
+          /\bzurückgeben|\bzurückgegeben\b|\b(?:gebe|gibst|gibt|geben)\b[^.!?]{0,40}\bzurück\b/i,
+          /\bgünstig(?:e|en|er|es)?\b/i,
+          /\bbequem(?:e|en|er|es)?\b/i
+        ];
+        const vocabularyCount = vocabularyPatterns.filter((pattern) => pattern.test(text)).length;
+        const reasons = text.match(/\bweil\b/gi) || [];
+        return {
+          length: words(value) >= 60 && words(value) <= 85,
+          vocabulary: vocabularyCount >= 3,
+          timeFirst: /(?:^|[.!?]\s*)(heute|morgen|im geschäft|im modegeschäft|zuerst|danach)\s+(wähle|vergleich(?:e|st|t|en)|gebe|gibst|gibt|ist|sind|habe|hat|brauche|brauchst|braucht)\s+(ich|wir|die|der|das|sie)\b/i.test(text),
+          reasons: reasons.length >= 2,
+          weilOrder: /\bweil\b[^.!?]{0,80}\b(ist|sind|passt|kosten|kostet|brauche|brauchst|braucht|möchte|möchtest|will|kann)\s*[.!?,]/i.test(text),
+          perfect: /\b(habe|hast|hat|haben|habt)\b[^.!?]{0,100}\b(ausgewählt|verglichen|zurückgegeben)\b/i.test(text),
+          question: /\?/.test(value)
+        };
+      },
+      messageLabels: {
+        length: "60–85 слов",
+        vocabulary: "три новых слова",
+        timeFirst: "время → глагол → кто?",
+        reasons: "две причины с weil",
+        weilOrder: "глагол в конце после weil",
+        perfect: "одно действие в Perfekt",
+        question: "новый вопрос по теме"
+      },
+      exitSuccess: "главное предложение и weil-Satz различаются увереннее",
+      exitReview: "первые ответы учтены; повтори только отмеченный порядок слов",
+      ready(checks, score) {
+        return score >= 3 && checks.length && checks.vocabulary && checks.timeFirst && checks.reasons && checks.weilOrder && checks.question;
+      },
+      readyCopy: "Ты объяснила две причины с weil, сохранила глагол в конце придаточного предложения и использовала минимум три новых слова.",
+      reviewCopy: "Урок завершён. Первые ответы сохранены, а нужный порядок слов показан рядом.",
+      followUp: "Was ist dir beim Einkaufen wichtiger: Preis, Farbe oder Qualität – und warum?",
+      teacherPrompt: "Please review whether Akmaral keeps the finite verb in position two after a fronted time phrase, moves it to the end after weil, and independently uses at least three target words (auswählen, vergleichen, zurückgeben, günstig, bequem). Ask a new topic-specific follow-up rather than reusing a previous question."
     }
   };
 

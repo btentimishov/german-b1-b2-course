@@ -381,7 +381,7 @@ html[lang="ru"] .noun-passport::after { content: "НАЖМИ ↻"; }
 
 .practice-table { display: grid; gap: 9px; margin-top: 28px; }
 .practice-row { display: grid; grid-template-columns: minmax(220px, 1fr) 130px minmax(90px, 0.45fr); gap: 12px; align-items: center; padding: 13px 14px; border: 2px solid var(--line); background: white; }
-.stop-blue .practice-row, .stop-blue .recall-row, .stop-blue .quiz-options button { color: var(--ink); }
+.stop-blue .practice-row, .stop-blue .recall-row, .stop-blue .quiz-options button, .stop-blue .model-board > div, .stop-blue .rule-strip { color: var(--ink); }
 .practice-row select { width: 100%; padding: 8px; border: 2px solid var(--ink); background: white; }
 .practice-row.is-right { border-color: var(--green); background: #ecffd8; }
 .practice-row.is-wrong { border-color: var(--red); background: #fff0ed; }
