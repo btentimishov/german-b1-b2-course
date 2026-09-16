@@ -15,7 +15,8 @@ const COURSE_LESSONS = [
   ["0012", "Wer gibt wem was – und warum?", "lessons/0012-wer-gibt-wem-was-und-warum.html"],
   ["0013", "Ihm, ihn oder es?", "lessons/0013-ihm-ihn-oder-es.html"],
   ["0014", "Er, ihm, ihn und sie, ihr, sie", "lessons/0014-er-ihm-ihn-und-sie-ihr-sie.html"],
-  ["0015", "Den Pronomen-Faden halten", "lessons/0015-wer-macht-was-mit-wem.html"]
+  ["0015", "Den Pronomen-Faden halten", "lessons/0015-wer-macht-was-mit-wem.html"],
+  ["0016", "Wer erzählt wem was?", "lessons/0016-wer-erzaehlt-wem-was.html"]
 ].map(([id, title, href]) => ({ id, title, href }));
 
 function readCourseState() {
@@ -845,6 +846,39 @@ document.querySelectorAll("[data-reference-story-production]").forEach((checker)
     feedback.textContent = passed === checks.length
       ? "8/8 Bausteine erkannt — kopiere dein Update jetzt zur inhaltlichen Bezugsprüfung."
       : `${passed}/8 Bausteine erkannt — prüfe die Satzschienen; die Bedeutung kontrolliert danach dein Lehrer.`;
+    feedback.className = `feedback ${passed === checks.length ? "good" : "try"}`;
+  });
+});
+
+document.querySelectorAll("[data-verb-reference-production]").forEach((checker) => {
+  const input = checker.querySelector("textarea");
+  const button = checker.querySelector("[data-check-production]");
+  const feedback = checker.querySelector(".feedback");
+  const checks = [...checker.querySelectorAll("[data-check]")];
+
+  button?.addEventListener("click", () => {
+    const text = input.value.trim();
+    const sentences = text.split(/[.!?]+/).map((part) => part.trim()).filter(Boolean);
+    const usefulVerbs = text.match(/\b(?:erkläre|erklärt|prüfe|prüft|schicke|schickt|zeige|zeigt|erzähle|erzählt|verstehe|versteht|brauche|braucht|kenne|kennt|helfe|hilft|danke|dankt|lese|liest|öffne|öffnet)\b/gi) || [];
+    const results = {
+      six: sentences.length >= 6,
+      subjects: /\bich\s+(?:erkläre|prüfe|schicke|zeige|erzähle|verstehe|helfe|danke|lese|öffne)\b/i.test(text)
+        && /\b(?:er|sie|es)\s+(?:erklärt|prüft|schickt|zeigt|erzählt|versteht|braucht|kennt|hilft|dankt|liest|öffnet)\b/i.test(text),
+      recipient: /\b(?:erzähle|erzählt|schicke|schickt|zeige|zeigt|erkläre|erklärt)\s+(?:ihm|ihr|dem|der|einem|einer)\s+(?:das|den|die|ein|eine|es|ihn|sie)\b/i.test(text),
+      reference: (text.match(/\b(?:das Angebot|das Ergebnis|die Nachricht|das Problem)\b/gi) || []).length >= 2
+        || /\b(?:er|sie|es)\b[^.!?]{0,40}\b(?:ihn|sie|es)\b/i.test(text),
+      weil: /\bweil\b[^.!?]*(?:versteht|braucht|prüft|kennt|erzählt|erklärt|liest|öffnet|muss|kann)\s*(?:[.!?]|$)/i.test(text),
+      verbs: new Set(usefulVerbs.map((verb) => verb.toLowerCase())).size >= 4
+    };
+    const passed = checks.reduce((count, item) => {
+      const ok = results[item.dataset.check];
+      item.classList.toggle("pass", ok);
+      return count + Number(ok);
+    }, 0);
+    checker.dataset.score = `${passed}/${checks.length}`;
+    feedback.textContent = passed === checks.length
+      ? "6/6 Bausteine erkannt — die inhaltliche Bezugsprüfung folgt im Lernbericht."
+      : `${passed}/6 Bausteine erkannt — prüfe Subjekt + Verbendung, erzählen mit Dativ und den klaren Bezug.`;
     feedback.className = `feedback ${passed === checks.length ? "good" : "try"}`;
   });
 });
