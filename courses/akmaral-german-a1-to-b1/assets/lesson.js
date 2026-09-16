@@ -296,6 +296,53 @@
       reviewCopy: "Урок завершён. Первые ответы сохранены, а нужный порядок слов показан рядом.",
       followUp: "Was ist dir beim Einkaufen wichtiger: Preis, Farbe oder Qualität – und warum?",
       teacherPrompt: "Please review whether Akmaral keeps the finite verb in position two after a fronted time phrase, moves it to the end after weil, and independently uses at least three target words (auswählen, vergleichen, zurückgeben, günstig, bequem). Ask a new topic-specific follow-up rather than reusing a previous question."
+    },
+    "lesson-0010": {
+      number: "10",
+      title: "Ein guter Lernplatz: ruhige oder laute Räume?",
+      focus: "plural adjective endings with and without die, plus plural sind and waren",
+      messageMinimum: 7,
+      messageChecks(value) {
+        const text = normalize(value);
+        const vocabularyPatterns = [
+          /\bruhig(?:e|en|er|es)?\b/i,
+          /\bhell(?:e|en|er|es)?\b/i,
+          /\blaut(?:e|en|er|es)?\b/i,
+          /\bpraktisch(?:e|en|er|es)?\b/i,
+          /\bzentral(?:e|en|er|es)?\b/i
+        ];
+        const vocabularyCount = vocabularyPatterns.filter((pattern) => pattern.test(text)).length;
+        const pluralNouns = "(?:räume|arbeitsplätze|cafés|tische|bibliotheken)";
+        return {
+          length: words(value) >= 70 && words(value) <= 95,
+          vocabulary: vocabularyCount >= 3,
+          barePlural: new RegExp(`\\b(?:ruhige|helle|laute|praktische|zentrale)\\s+${pluralNouns}\\b`, "i").test(text),
+          definitePlural: new RegExp(`\\bdie\\s+(?:ruhigen|hellen|lauten|praktischen|zentralen)\\s+${pluralNouns}\\b`, "i").test(text),
+          presentPlural: new RegExp(`\\b(?:die\\s+)?${pluralNouns}\\b[^.!?]{0,45}\\bsind\\b`, "i").test(text),
+          pastPlural: new RegExp(`\\b(?:die\\s+)?${pluralNouns}\\b[^.!?]{0,45}\\bwaren\\b`, "i").test(text),
+          reason: /\bweil\b[^.!?]{0,80}\b(ist|sind|war|waren|liegt|liegen|kann|können)\s*[.!?,]/i.test(text),
+          question: /\?/.test(value)
+        };
+      },
+      messageLabels: {
+        length: "70–95 слов",
+        vocabulary: "три новых слова",
+        barePlural: "ruhige Räume: без артикля → -e",
+        definitePlural: "die ruhigen Räume: после die → -en",
+        presentPlural: "множественное число с sind",
+        pastPlural: "множественное число с waren",
+        reason: "одна причина с weil",
+        question: "новый вопрос об учёбе"
+      },
+      exitSuccess: "окончания прилагательных и формы sind/waren согласованы во множественном числе",
+      exitReview: "первые ответы учтены; повтори только отмеченные формы множественного числа",
+      ready(checks, score) {
+        return score >= 3 && checks.length && checks.vocabulary && checks.barePlural && checks.definitePlural && checks.presentPlural && checks.pastPlural && checks.question;
+      },
+      readyCopy: "Ты описала учебное место, использовала минимум три новых слова и показала обе модели множественного числа: ruhige Räume / die ruhigen Räume и sind/waren.",
+      reviewCopy: "Урок завершён. Первые ответы сохранены, а нужные окончания и формы множественного числа показаны рядом.",
+      followUp: "Wo kannst du dich besser konzentrieren: zu Hause, in der Bibliothek oder im Café?",
+      teacherPrompt: "Please review whether Akmaral distinguishes bare plural adjective endings (ruhige Räume) from definite plural endings (die ruhigen Räume), agrees plural subjects with sind/waren, and independently uses at least three target adjectives (ruhig, hell, laut, praktisch, zentral). Ask a new study-related follow-up rather than returning to shopping or yesterday."
     }
   };
 
