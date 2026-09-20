@@ -343,6 +343,53 @@
       reviewCopy: "Урок завершён. Первые ответы сохранены, а нужные окончания и формы множественного числа показаны рядом.",
       followUp: "Wo kannst du dich besser konzentrieren: zu Hause, in der Bibliothek oder im Café?",
       teacherPrompt: "Please review whether Akmaral distinguishes bare plural adjective endings (ruhige Räume) from definite plural endings (die ruhigen Räume), agrees plural subjects with sind/waren, and independently uses at least three target adjectives (ruhig, hell, laut, praktisch, zentral). Ask a new study-related follow-up rather than returning to shopping or yesterday."
+    },
+    "lesson-0011": {
+      number: "11",
+      title: "Zu Hause oder Bibliothek? Vergleichen mit als",
+      focus: "study-place comparisons with regular -er, besser, lieber, and als",
+      messageMinimum: 7,
+      messageChecks(value) {
+        const text = normalize(value);
+        const vocabularyPatterns = [
+          /\bkonzentrier(?:e|st|t|en)|\bkonzentriert\b/i,
+          /\bstör(?:e|st|t|en)|\bgestört\b/i,
+          /\bsteckdosen?\b/i,
+          /\böffnungszeiten?\b/i,
+          /\berreichbar\b/i
+        ];
+        const vocabularyCount = vocabularyPatterns.filter((pattern) => pattern.test(text)).length;
+        const comparisons = text.match(/\bals\b/gi) || [];
+        return {
+          length: words(value) >= 80 && words(value) <= 105,
+          vocabulary: vocabularyCount >= 3,
+          comparisons: comparisons.length >= 3,
+          regular: /\b(ruhiger|heller|praktischer|zentraler|gemütlicher|flexibler)\b[^.!?]{0,80}\bals\b/i.test(text),
+          better: /\bbesser\b[^.!?]{0,80}\bals\b/i.test(text),
+          prefer: /\blieber\b[^.!?]{0,80}\bals\b/i.test(text),
+          reason: /\bweil\b[^.!?]{0,80}\b(ist|sind|war|waren|kann|können|möchte|möchten|will|wollen)\s*[.!?,]/i.test(text),
+          question: /\?/.test(value)
+        };
+      },
+      messageLabels: {
+        length: "80–105 слов",
+        vocabulary: "три новых слова",
+        comparisons: "три сравнения с als",
+        regular: "обычная форма на -er",
+        better: "besser als",
+        prefer: "lieber … als",
+        reason: "одна причина с weil",
+        question: "новый вопрос об учёбе"
+      },
+      exitSuccess: "места для учёбы сравнены с -er, besser, lieber и als",
+      exitReview: "первые ответы учтены; повтори только отмеченные модели сравнения",
+      ready(checks, score) {
+        return score >= 3 && checks.length && checks.vocabulary && checks.comparisons && checks.regular && checks.better && checks.prefer && checks.question;
+      },
+      readyCopy: "Ты сравнила два места для учёбы тремя способами, использовала минимум три новых слова и задала новый вопрос по теме.",
+      reviewCopy: "Урок завершён. Первые ответы сохранены, а нужные формы сравнения показаны рядом.",
+      followUp: "Lernst du lieber allein oder mit anderen – und warum?",
+      teacherPrompt: "Please review whether Akmaral uses comparative -er plus als, distinguishes besser from lieber, and independently uses at least three target items (sich konzentrieren, stören, die Steckdose, die Öffnungszeiten, gut erreichbar). Ask a new study-related follow-up rather than repeating where she studies."
     }
   };
 
